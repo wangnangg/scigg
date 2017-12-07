@@ -187,5 +187,4 @@ bool operator==(const sps_entry& x, const sps_entry& y)
 {
     return x.idx == y.idx && x.val == y.val;
 }
-
 }

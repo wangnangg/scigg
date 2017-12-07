@@ -3,7 +3,7 @@
 
 namespace markovgg
 {
-    bool near_eq(const vec &x, const vec &y, double prec)
+bool near_eq(const vec &x, const vec &y, double prec)
 {
     for (size_t i = 0; i < x.dim(); i++)
     {
@@ -62,7 +62,6 @@ real_t vec_sum(const vec &v)
     }
     return vsum;
 }
-
 
 void set_vec_sum(vec &v, real_t val)
 {
@@ -140,8 +139,6 @@ void mul(vec &x, const vec &v, const matrix &A)
     fill(x, 0.0);
     acc_mul(x, v, A);
 }
-
-
 
 void scale(matrix &A, real_t a)
 {
@@ -222,7 +219,6 @@ vec part_vec(const vec &v, const std::vector<size_t> &sorted_valid_idx)
     }
     return p;
 }
-
 
 sqr_mat transpose(const sqr_mat &mat)
 {

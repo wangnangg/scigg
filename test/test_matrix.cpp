@@ -46,7 +46,6 @@ matrix create_matrix(size_t row_dim, size_t col_dim,
     return mat_crt.create();
 }
 
-
 TEST(test_matrix, sqr_create)
 {
     sqr_mat_crtor mat_crt(3);
@@ -62,7 +61,6 @@ TEST(test_matrix, sqr_create)
     ASSERT_EQ(cmat(1, 2), 3.0);
     ASSERT_EQ(cmat(2, 2), 3.0);
     ASSERT_EQ(cmat(1, 0), 0.0);
-
 }
 
 TEST(test_matrix, matrix_create)

@@ -27,5 +27,4 @@ public:
     timed_scope(const char* name);
     ~timed_scope();
 };
-
 }
