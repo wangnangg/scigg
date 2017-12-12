@@ -2,49 +2,9 @@
 #include "common.hpp"
 #include "debug_utils.hpp"
 #include "gtest/gtest.h"
+#include "linear_eqt.hpp"
 #include "matrix.hpp"
 #include "matrix_oper.hpp"
-
-using namespace markovgg;
-
-vec create_vec(const std::vector<real_t>& val)
-{
-    vec v(val.size(), 0.0);
-    for (size_t i = 0; i < v.dim(); i++)
-    {
-        v[i] = val[i];
-    }
-    return v;
-}
-
-sqr_mat create_sqr_mat(size_t dim, const std::vector<real_t>& val)
-{
-    sqr_mat_crtor mat_crt(dim);
-    assert(dim * dim == val.size());
-    for (size_t i = 0; i < dim; i++)
-    {
-        for (size_t j = 0; j < dim; j++)
-        {
-            mat_crt.add_entry(i, j, val[i * dim + j]);
-        }
-    }
-    return mat_crt.create();
-}
-
-matrix create_matrix(size_t row_dim, size_t col_dim,
-                     const std::vector<real_t>& val)
-{
-    matrix_crtor mat_crt(row_dim, col_dim);
-    assert(row_dim * col_dim == val.size());
-    for (size_t i = 0; i < row_dim; i++)
-    {
-        for (size_t j = 0; j < col_dim; j++)
-        {
-            mat_crt.add_entry(i, j, val[i * col_dim + j]);
-        }
-    }
-    return mat_crt.create();
-}
 
 TEST(test_matrix, sqr_create)
 {
@@ -170,4 +130,62 @@ TEST(test_matrix, mul)
     acc_mul(right, left, mat);
     print_vec(right);
     ASSERT_EQ(mul(ans, 2), right);
+}
+
+static iter_ctrl ctrl = {1e-10, 10, 1000};
+
+TEST(test_linear_eqt, power_method)
+{
+    sqr_mat mat = create_sqr_mat(5, {
+                                        0.6, 0.4, 0,   0,   0,    //
+                                        0.6, 0,   0.4, 0,   0,    //
+                                        0,   0.6, 0,   0.4, 0,    //
+                                        0,   0,   0.6, 0,   0.4,  //
+                                        0,   0,   0,   0.6, 0.4   //
+                                    });
+    vec x(mat.dim(), 0.0);
+    x[0] = 1.0;
+    real_t prec = power_method(x, mat, ctrl);
+    print_vec(x);
+    print_mat(mat);
+    ASSERT_LT(prec, ctrl.target_prec);
+    ASSERT_TRUE(near_eq(x, mul(x, mat), prec));
+}
+
+TEST(test_linear_eqt, sor_method)
+{
+    sqr_mat mat = create_sqr_mat(5, {
+                                        -1, 1,  0,  0,  0,  //
+                                        2,  -3, 1,  0,  0,  //
+                                        0,  2,  -3, 1,  0,  //
+                                        0,  0,  2,  -3, 1,  //
+                                        0,  0,  0,  2,  -3  //
+                                    });
+    vec b(mat.dim(), 0.0);
+    b[0] = -1;
+    vec x(mat.dim(), 0.0);
+    real_t prec = sor_method(x, mat, b, 1.5, ctrl);
+    print_vec(x);
+    print_mat(mat);
+    print_vec(b);
+    ASSERT_LT(prec, ctrl.target_prec);
+}
+
+TEST(test_linear_eqt, sor_method_with_sum)
+{
+    sqr_mat mat = create_sqr_mat(5, {
+            -0.4, 0.4, 0,   0,   0,    //
+                0.6, -1.0,   0.4, 0,   0,    //
+                0,   0.6, -1.0,   0.4, 0,    //
+                0,   0,   0.6, -1.0,   0.4,  //
+                0,   0,   0,   0.6, -0.6   //
+                });
+    vec b(mat.dim(), 0.0);
+    vec x(mat.dim(), 1.0);
+    real_t prec = sor_method(x, mat, b, 1.0, 1.0, ctrl);
+    print_vec(x);
+    print_mat(mat);
+    print_vec(b);
+    ASSERT_LT(prec, ctrl.target_prec);
+    ASSERT_TRUE(near_eq(b, mul(x, mat), prec));
 }
