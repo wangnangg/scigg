@@ -1,8 +1,8 @@
 #include "linear_eqt.hpp"
+#include <cassert>
 #include "debug_utils.hpp"
 #include "matrix.hpp"
 #include "matrix_oper.hpp"
-#include <cassert>
 namespace markovgg
 {
 real_t max_diff(const vec& v1, const vec& v2)
@@ -150,5 +150,4 @@ real_t sor_method(vec& x, const sqr_mat& A, const vec& b, real_t sum, real_t w,
     mul(b_curr, x, A);
     return prec_check(x_next, x, b, b_curr);
 }
-
 }

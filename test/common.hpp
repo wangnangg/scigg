@@ -1,8 +1,8 @@
 #pragma once
 #include <utility>
 #include <vector>
-#include "type.hpp"
 #include "matrix.hpp"
+#include "type.hpp"
 
 using namespace markovgg;
 

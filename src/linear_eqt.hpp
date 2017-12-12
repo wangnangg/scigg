@@ -48,4 +48,3 @@ real_t solve_linear_eq(vec& x, const sqr_mat& A, const vec& b, iter_ctrl ctrl,
 real_t solve_linear_eq(vec& x, const sqr_mat& A, const vec& b, real_t sum,
                        iter_ctrl ctrl, linear_solve_method method);
 }
-

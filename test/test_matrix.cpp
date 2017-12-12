@@ -174,12 +174,12 @@ TEST(test_linear_eqt, sor_method)
 TEST(test_linear_eqt, sor_method_with_sum)
 {
     sqr_mat mat = create_sqr_mat(5, {
-            -0.4, 0.4, 0,   0,   0,    //
-                0.6, -1.0,   0.4, 0,   0,    //
-                0,   0.6, -1.0,   0.4, 0,    //
-                0,   0,   0.6, -1.0,   0.4,  //
-                0,   0,   0,   0.6, -0.6   //
-                });
+                                        -0.4, 0.4,  0,    0,    0,    //
+                                        0.6,  -1.0, 0.4,  0,    0,    //
+                                        0,    0.6,  -1.0, 0.4,  0,    //
+                                        0,    0,    0.6,  -1.0, 0.4,  //
+                                        0,    0,    0,    0.6,  -0.6  //
+                                    });
     vec b(mat.dim(), 0.0);
     vec x(mat.dim(), 1.0);
     real_t prec = sor_method(x, mat, b, 1.0, 1.0, ctrl);
