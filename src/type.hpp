@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <exception>
 #include <string>
+namespace markovgg
+{
 using std::size_t;
 typedef double real_t;
 typedef int int_t;
@@ -14,3 +16,4 @@ public:
 private:
     std::string _msg;
 };
+}

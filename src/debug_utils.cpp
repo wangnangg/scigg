@@ -2,38 +2,35 @@
 #include "matrix.hpp"
 namespace markovgg
 {
-void print_mat(const matrix& mat, uint8_t width)
+std::ostream& operator<<(std::ostream& os, const matrix& mat)
 {
-    if (mat.row_dim() > 100 && mat.col_dim() > 100)
+    if (mat.m() > 100 && mat.n() > 100)
     {
-        return;
+        return os << "matrix (" << mat.m() << ", " << mat.n() << ")";
     }
-    std::cout << std::endl;
-    for (size_t i = 0; i < mat.row_dim(); i++)
+    for (size_t i = 0; i < mat.m(); i++)
     {
-        for (size_t j = 0; j < mat.col_dim(); j++)
+        for (size_t j = 0; j < mat.n(); j++)
         {
-            std::cout << std::setw(width) << mat(i, j) << " ";
+            os << std::setw(6) << mat(i, j) << " ";
         }
-        std::cout << std::endl;
+        os << std::endl;
     }
-    std::cout << std::endl;
+    return os;
 }
-
-void print_vec(const vec& v)
+std::ostream& operator<<(std::ostream& os, const vector& v)
 {
     if (v.dim() > 100)
     {
-        return;
+        return os << "vector (" << v.dim() << ")";
     }
-    std::cout << "( ";
+    os << "[ ";
     for (size_t i = 0; i < v.dim(); i++)
     {
-        std::cout << v[i] << " ";
+        os << v[i] << " ";
     }
-    std::cout << ")" << std::endl;
+    return os << "]" << std::endl;
 }
-
 timed_scope::timed_scope(const char* name)
 {
     std::cout << name << " timer started." << std::endl;

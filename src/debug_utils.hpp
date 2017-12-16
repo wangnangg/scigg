@@ -3,20 +3,18 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
-
+#include "matrix.hpp"
+#include "vector.hpp"
 namespace markovgg
 {
-template <typename val_t>
-void print(const val_t& s)
+std::ostream& operator<<(std::ostream& os, const matrix& mat);
+std::ostream& operator<<(std::ostream& os, const vector& v);
+
+template <typename M>
+void print(const M& v)
 {
-    std::cout << s << std::endl;
+    std::cout << v << std::endl;
 }
-
-class matrix;
-void print_mat(const matrix& mat, uint8_t width = 6);
-
-class vec;
-void print_vec(const vec& v);
 
 class timed_scope
 {
