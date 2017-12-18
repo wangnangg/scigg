@@ -45,8 +45,9 @@ void matrix_vector(real_t alpha, const matrix& A, bool transpose,
 
 // level 3 blas
 // C = alpha * A * B + beta * C
-void gen_matrix_matrix(real_t alpha, const matrix& A, const matrix& B,
-                       real_t beta, matrix& C);
+void gen_matrix_matrix(real_t alpha, const matrix& A, bool tranposeA,
+                       const matrix& B, bool transposeB, real_t beta,
+                       matrix& C);
 
 // rank k or 2k op, omitted
 };

@@ -24,6 +24,7 @@ public:
 
 private:
     std::vector<real_t> _data;
-    friend bool operator==(const vector &x, const vector &y);
 };
+
+bool operator==(const vector &x, const vector &y);
 }

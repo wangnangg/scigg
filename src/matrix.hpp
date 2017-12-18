@@ -35,4 +35,6 @@ public:
     const real_t *begin() const { return &*_data.begin(); }
     const real_t *end() const { return &*_data.end(); }
 };
+
+bool operator==(const matrix &m1, const matrix &m2);
 }

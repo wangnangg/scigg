@@ -52,6 +52,7 @@ TEST(test_blas, level1)
 
 matrix create_matrix(size_t m, size_t n, const std::vector<double>& v)
 {
+    assert(m * n == v.size());
     matrix M(m, n);
     for (size_t i = 0; i < m; i++)
     {
@@ -94,4 +95,40 @@ TEST(test_blas, level2)
     matrix_vector(2.0, M, true, y, 3.0, x);
     print(x);
     ASSERT_EQ(x, create_vector(5, {-205, -228, -251, -274, -297}));
+}
+
+TEST(test_blas, level3)
+{
+    matrix A = create_matrix(4, 5,
+                             {
+                                 1,  2,  3,  4,  5,   //
+                                 6,  7,  8,  9,  10,  //
+                                 11, 12, 13, 14, 15,  //
+                                 16, 17, 18, 19, 20   //
+                             });
+    matrix B = create_matrix(5, 3,
+                             {
+                                 1, -2, 3,   //
+                                 6, -6, 8,   //
+                                 11, 5, 13,  //
+                                 16, 4, 18,  //
+                                 1, -4, -3,  //
+                             });
+    matrix C = create_matrix(4, 3,
+                             {
+                                 1, 1, 1,   //
+                                 2, 2, 2,   //
+                                 3, 5, 13,  //
+                                 4, 4, 18,  //
+                             });
+
+    // C = alpha * A * B + beta * C
+    gen_matrix_matrix(2.0, A, false, B, false, 3.0, C);
+    ASSERT_EQ(C, create_matrix(4, 3,
+                               {
+                                   233, -3, 233,     //
+                                   586, -30, 626,    //
+                                   939, -51, 1049,   //
+                                   1292, -84., 1454  //
+                               }));
 }
