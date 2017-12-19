@@ -7,10 +7,10 @@ namespace markovgg
 matrix create_matrix(size_t m, size_t n, const std::vector<double>& v);
 vector create_vector(size_t n, const std::vector<double>& v);
 
-vector_const_view row_const_view(const matrix_const_view& A, size_t row_idx);
-vector_mutable_view row_mutable_view(matrix_mutable_view& A, size_t row_idx);
-vector_const_view col_const_view(const matrix_const_view& A, size_t col_idx);
-vector_mutable_view col_mutable_view(matrix_mutable_view& A, size_t col_idx);
+vector_const_view row_const_view(matrix_const_view A, size_t row_idx);
+vector_mutable_view row_mutable_view(matrix_mutable_view A, size_t row_idx);
+vector_const_view col_const_view(matrix_const_view A, size_t col_idx);
+vector_mutable_view col_mutable_view(matrix_mutable_view A, size_t col_idx);
 
 template <typename mat_type>
 vector row_vector(const mat_type& A, size_t row_idx)

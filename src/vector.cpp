@@ -2,7 +2,7 @@
 
 namespace markovgg
 {
-bool operator==(const vector_const_view &x, const vector_const_view &y)
+bool operator==(vector_const_view x, vector_const_view y)
 {
     if (x.dim() != y.dim())
     {

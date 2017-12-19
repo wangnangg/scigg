@@ -5,40 +5,40 @@ namespace markovgg
 {
 // level 1 blas
 
-real_t blas_dot(const vector_const_view& v1, const vector_const_view& v2)
+real_t blas_dot(vector_const_view v1, vector_const_view v2)
 {
     assert(v1.dim() == v2.dim());
     return cblas_ddot(v1.dim(), &v1[0], v1.inc(), &v2[0], v2.inc());
 }
-real_t blas_norm2(const vector_const_view& v)
+real_t blas_norm2(vector_const_view v)
 {
     return cblas_dnrm2(v.dim(), &v[0], v.inc());
 }
 
-real_t blas_abs_sum(const vector_const_view& v)
+real_t blas_abs_sum(vector_const_view v)
 {
     return cblas_dasum(v.dim(), &v[0], v.inc());
 }
 
-size_t blas_abs_max_idx(const vector_const_view& v)
+size_t blas_abs_max_idx(vector_const_view v)
 {
     return cblas_idamax(v.dim(), &v[0], v.inc());
 }
 
-void blas_swap(vector_mutable_view& v1, vector_mutable_view& v2)
+void blas_swap(vector_mutable_view v1, vector_mutable_view v2)
 {
     assert(v1.dim() == v2.dim());
     cblas_dswap(v1.dim(), &v1[0], v1.inc(), &v2[0], v2.inc());
 }
 
-void blas_copy(const vector_const_view& src, vector_mutable_view& dst)
+void blas_copy(vector_const_view src, vector_mutable_view dst)
 {
     assert(src.dim() == dst.dim());
     cblas_dcopy(src.dim(), &src[0], src.inc(), &dst[0], dst.inc());
 }
 
 // y = ax + y
-void blas_axpy(real_t a, const vector_const_view& x, vector_mutable_view& y)
+void blas_axpy(real_t a, vector_const_view x, vector_mutable_view y)
 {
     assert(x.dim() == y.dim());
     cblas_daxpy(x.dim(), a, &x[0], x.inc(), &y[0], y.inc());
@@ -53,7 +53,7 @@ void blas_axpy(real_t a, const vector_const_view& x, vector_mutable_view& y)
 //                double *Y, const int incY, const double *P);
 
 // x = ax
-void blas_scale(real_t alpha, vector_mutable_view& v)
+void blas_scale(real_t alpha, vector_mutable_view v)
 {
     cblas_dscal(v.dim(), alpha, &v[0], v.inc());
 }
@@ -61,9 +61,8 @@ void blas_scale(real_t alpha, vector_mutable_view& v)
 // level 2 blas
 
 // y = alpha * A * x + beta * y
-void blas_matrix_vector(real_t alpha, const matrix_const_view& A,
-                        bool transposeA, const vector_const_view& x,
-                        real_t beta, vector_mutable_view& y)
+void blas_matrix_vector(real_t alpha, matrix_const_view A, bool transposeA,
+                        vector_const_view x, real_t beta, vector_mutable_view y)
 {
     if (!transposeA)
     {
@@ -86,9 +85,9 @@ void blas_matrix_vector(real_t alpha, const matrix_const_view& A,
 
 // level 3 blas
 // C = alpha * A * B + beta * C
-void blas_matrix_matrix(real_t alpha, const matrix_const_view& A,
-                        bool transposeA, const matrix_const_view& B,
-                        bool transposeB, real_t beta, matrix_mutable_view& C)
+void blas_matrix_matrix(real_t alpha, matrix_const_view A, bool transposeA,
+                        matrix_const_view B, bool transposeB, real_t beta,
+                        matrix_mutable_view C)
 {
     size_t K = transposeA ? A.m() : A.n();
     assert(transposeB ? B.n() : B.m() == K);

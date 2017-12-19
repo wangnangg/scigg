@@ -10,20 +10,20 @@ namespace markovgg
 {
 // level 1 blas
 
-real_t blas_dot(const vector_const_view& v1, const vector_const_view& v2);
+real_t blas_dot(vector_const_view v1, vector_const_view v2);
 
-real_t blas_norm2(const vector_const_view& v);
+real_t blas_norm2(vector_const_view v);
 
-real_t blas_abs_sum(const vector_const_view& v);
+real_t blas_abs_sum(vector_const_view v);
 
-size_t blas_abs_max_idx(const vector_const_view& v);
+size_t blas_abs_max_idx(vector_const_view v);
 
-void blas_swap(vector_mutable_view& v1, vector_mutable_view& v2);
+void blas_swap(vector_mutable_view v1, vector_mutable_view v2);
 
-void blas_copy(const vector_const_view& src, vector_mutable_view& dst);
+void blas_copy(vector_const_view src, vector_mutable_view dst);
 
 // y = ax + y
-void blas_axpy(real_t a, const vector_const_view& x, vector_mutable_view& y);
+void blas_axpy(real_t a, vector_const_view x, vector_mutable_view y);
 
 // Rotation, omitted
 // void cblas_drotg(double *a, double *b, double *c, double *s);
@@ -34,13 +34,13 @@ void blas_axpy(real_t a, const vector_const_view& x, vector_mutable_view& y);
 //                double *Y, const int incY, const double *P);
 
 // x = ax
-void blas_scale(real_t alpha, vector_mutable_view& v);
+void blas_scale(real_t alpha, vector_mutable_view v);
 
 // level 2 blas
 // y = alpha * A * x + beta * y
-void blas_matrix_vector(real_t alpha, const matrix_const_view& A,
-                        bool transposeA, const vector_const_view& x,
-                        real_t beta, vector_mutable_view& y);
+void blas_matrix_vector(real_t alpha, matrix_const_view A, bool transposeA,
+                        vector_const_view x, real_t beta,
+                        vector_mutable_view y);
 
 // rank 1 or 2 op, omitted
 // A = alpha * x * y' + A
@@ -48,9 +48,9 @@ void blas_matrix_vector(real_t alpha, const matrix_const_view& A,
 
 // level 3 blas
 // C = alpha * A * B + beta * C
-void blas_matrix_matrix(real_t alpha, const matrix_const_view& A,
-                        bool transposeA, const matrix_const_view& B,
-                        bool transposeB, real_t beta, matrix_mutable_view& C);
+void blas_matrix_matrix(real_t alpha, matrix_const_view A, bool transposeA,
+                        matrix_const_view B, bool transposeB, real_t beta,
+                        matrix_mutable_view C);
 
 // rank k or 2k op, omitted
 };

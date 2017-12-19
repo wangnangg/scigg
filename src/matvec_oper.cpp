@@ -24,22 +24,22 @@ vector create_vector(size_t n, const std::vector<double>& v)
     }
     return vo;
 }
-vector_const_view row_const_view(const matrix_const_view& A, size_t row_idx)
+vector_const_view row_const_view(matrix_const_view A, size_t row_idx)
 {
     return vector_const_view(&A(row_idx, 0), A.n(), 1);
 }
 
-vector_mutable_view row_mutable_view(matrix_mutable_view& A, size_t row_idx)
+vector_mutable_view row_mutable_view(matrix_mutable_view A, size_t row_idx)
 {
     return vector_mutable_view(&A(row_idx, 0), A.n(), 1);
 }
 
-vector_const_view col_const_view(const matrix_const_view& A, size_t col_idx)
+vector_const_view col_const_view(matrix_const_view A, size_t col_idx)
 {
     return vector_const_view(&A(0, col_idx), A.m(), A.ldim());
 }
 
-vector_mutable_view col_mutable_view(matrix_mutable_view& A, size_t col_idx)
+vector_mutable_view col_mutable_view(matrix_mutable_view A, size_t col_idx)
 {
     return vector_mutable_view(&A(0, col_idx), A.m(), A.ldim());
 }

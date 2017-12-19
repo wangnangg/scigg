@@ -2,7 +2,7 @@
 
 namespace markovgg
 {
-bool operator==(const matrix_const_view &m1, const matrix_const_view &m2)
+bool operator==(matrix_const_view m1, matrix_const_view m2)
 {
     if (m1.m() != m2.m() || m1.n() != m2.n())
     {
