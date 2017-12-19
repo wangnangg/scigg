@@ -1,11 +1,14 @@
 #include "linalg.hpp"
+#include <cassert>
 #include "blas.hpp"
 #include "matvec_oper.hpp"
-
 namespace markovgg
 {
 void QR_decomp_MGS(matrix& AQ, matrix& R)
 {
+    assert(AQ.n() <= AQ.m());
+    assert(R.n() == R.m());
+    assert(AQ.n() == R.m());
     for (size_t i = 0; i < AQ.n(); i++)
     {
         auto qi = col_mutable_view(AQ, i);
