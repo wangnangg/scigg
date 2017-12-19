@@ -2,22 +2,21 @@
 
 namespace markovgg
 {
-bool operator==(const matrix &m1, const matrix &m2)
+bool operator==(const matrix_const_view &m1, const matrix_const_view &m2)
 {
     if (m1.m() != m2.m() || m1.n() != m2.n())
     {
         return false;
     }
-    const real_t *e1 = m1.begin();
-    const real_t *e2 = m2.begin();
-    while (e1 != m1.end())
+    for (size_t i = 0; i < m1.m(); i++)
     {
-        if (*e1 != *e2)
+        for (size_t j = 0; j < m1.n(); j++)
         {
-            return false;
+            if (m1(i, j) != m2(i, j))
+            {
+                return false;
+            }
         }
-        e1 += 1;
-        e2 += 1;
     }
     return true;
 }

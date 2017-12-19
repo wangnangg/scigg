@@ -7,8 +7,8 @@
 #include "vector.hpp"
 namespace markovgg
 {
-std::ostream& operator<<(std::ostream& os, const matrix& mat);
-std::ostream& operator<<(std::ostream& os, const vector& v);
+std::ostream& operator<<(std::ostream& os, const matrix_const_view& mat);
+std::ostream& operator<<(std::ostream& os, const vector_const_view& v);
 
 template <typename M>
 void print(const M& v)

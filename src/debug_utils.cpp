@@ -2,7 +2,7 @@
 #include "matrix.hpp"
 namespace markovgg
 {
-std::ostream& operator<<(std::ostream& os, const matrix& mat)
+std::ostream& operator<<(std::ostream& os, const matrix_const_view& mat)
 {
     if (mat.m() > 100 && mat.n() > 100)
     {
@@ -18,7 +18,8 @@ std::ostream& operator<<(std::ostream& os, const matrix& mat)
     }
     return os;
 }
-std::ostream& operator<<(std::ostream& os, const vector& v)
+
+std::ostream& operator<<(std::ostream& os, const vector_const_view& v)
 {
     if (v.dim() > 100)
     {
