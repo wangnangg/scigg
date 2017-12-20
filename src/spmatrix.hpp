@@ -6,8 +6,8 @@ namespace markovgg
 {
 enum spmatrix_format
 {
-    CRS,  // compressed row storage
-    CCS,  // compressed column storage
+    CPR_ROW,  // compressed row storage
+    CPR_COL,  // compressed column storage
 };
 struct spmat_cs_entry
 {
@@ -51,7 +51,7 @@ public:
           _ptr(std::move(ptr)),
           _data(std::move(data))
     {
-        if (format == CRS)
+        if (format == CPR_ROW)
         {
             assert(_ptr.size() - 1 == m);
         }

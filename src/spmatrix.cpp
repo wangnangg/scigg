@@ -27,7 +27,7 @@ const spmat_cs_entry& bin_search(const spmat_cs_entry* first,
 
 real_t spmatrix::operator()(size_t row, size_t col) const
 {
-    if (_format == CRS)
+    if (_format == CPR_ROW)
     {
         auto target = spmat_cs_entry{col, 0.0};
         auto view = this->operator[](row);
@@ -43,8 +43,8 @@ real_t spmatrix::operator()(size_t row, size_t col) const
     }
 }
 
-static bool cmp_CRS(const spmat_triplet_entry& e1,
-                    const spmat_triplet_entry& e2)
+static bool cmp_CPR_ROW(const spmat_triplet_entry& e1,
+                        const spmat_triplet_entry& e2)
 {
     if (e1.row < e2.row)
     {
@@ -64,8 +64,8 @@ static bool cmp_CRS(const spmat_triplet_entry& e1,
     }
 }
 
-static bool cmp_CCS(const spmat_triplet_entry& e1,
-                    const spmat_triplet_entry& e2)
+static bool cmp_CPR_COL(const spmat_triplet_entry& e1,
+                        const spmat_triplet_entry& e2)
 {
     if (e1.col < e2.col)
     {
@@ -87,9 +87,9 @@ static bool cmp_CCS(const spmat_triplet_entry& e1,
 
 spmatrix spmatrix_creator::create(spmatrix_format format)
 {
-    if (format == CRS)
+    if (format == CPR_ROW)
     {
-        std::sort(_data.begin(), _data.end(), cmp_CRS);
+        std::sort(_data.begin(), _data.end(), cmp_CPR_ROW);
         std::vector<size_t> idx;
         idx.reserve(_m + 1);
         std::vector<spmat_cs_entry> val;
@@ -122,7 +122,7 @@ spmatrix spmatrix_creator::create(spmatrix_format format)
     }
     else
     {
-        std::sort(_data.begin(), _data.end(), cmp_CCS);
+        std::sort(_data.begin(), _data.end(), cmp_CPR_COL);
         std::vector<size_t> idx;
         idx.reserve(_n + 1);
         std::vector<spmat_cs_entry> val;
