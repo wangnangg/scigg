@@ -3,12 +3,29 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 #include "matrix.hpp"
+#include "spmatrix.hpp"
 #include "vector.hpp"
 namespace markovgg
 {
 std::ostream& operator<<(std::ostream& os, const matrix_const_view& mat);
 std::ostream& operator<<(std::ostream& os, const vector_const_view& v);
+std::ostream& operator<<(std::ostream& os, const spmatrix& mat);
+std::ostream& operator<<(std::ostream& os, const spmat_cs_entry& e);
+std::ostream& operator<<(std::ostream& os, const spmat_triplet_entry& e);
+template <class T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& v)
+{
+    os << "(";
+    for (typename std::vector<T>::const_iterator ii = v.begin(); ii != v.end();
+         ++ii)
+    {
+        os << " " << *ii;
+    }
+    os << ")";
+    return os;
+}
 
 template <typename M>
 void print(const M& v)

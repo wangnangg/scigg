@@ -8,6 +8,7 @@ std::ostream& operator<<(std::ostream& os, const matrix_const_view& mat)
     {
         return os << "matrix (" << mat.m() << ", " << mat.n() << ")";
     }
+    os << "matrix:" << std::endl;
     for (size_t i = 0; i < mat.m(); i++)
     {
         for (size_t j = 0; j < mat.n(); j++)
@@ -30,7 +31,35 @@ std::ostream& operator<<(std::ostream& os, const vector_const_view& v)
     {
         os << v[i] << " ";
     }
-    return os << "]" << std::endl;
+    return os << "]";
+}
+
+std::ostream& operator<<(std::ostream& os, const spmatrix& mat)
+{
+    if (mat.m() > 100 && mat.n() > 100)
+    {
+        return os << "spmatrix (" << mat.m() << ", " << mat.n() << ")";
+    }
+    os << "spmatrix:" << std::endl;
+    for (size_t i = 0; i < mat.m(); i++)
+    {
+        for (size_t j = 0; j < mat.n(); j++)
+        {
+            os << std::setw(6) << mat(i, j) << " ";
+        }
+        os << std::endl;
+    }
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const spmat_cs_entry& e)
+{
+    std::cout << "{" << e.idx << ", " << e.val << "}";
+}
+
+std::ostream& operator<<(std::ostream& os, const spmat_triplet_entry& e)
+{
+    std::cout << "{" << e.row << ", " << e.col << ", " << e.val << "}";
 }
 timed_scope::timed_scope(const char* name)
 {
