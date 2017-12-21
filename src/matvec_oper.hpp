@@ -12,33 +12,7 @@ vector_mutable_view row_mutable_view(matrix_mutable_view A, size_t row_idx);
 vector_const_view col_const_view(matrix_const_view A, size_t col_idx);
 vector_mutable_view col_mutable_view(matrix_mutable_view A, size_t col_idx);
 
-template <typename mat_type>
-vector row_vector(const mat_type& A, size_t row_idx)
-{
-    vector v(A.n());
-    for (size_t i = 0; i < A.n(); i++)
-    {
-        v[i] = A(row_idx, i);
-    }
-    return v;
-}
-
-template <typename mat_type>
-vector col_vector(const mat_type& A, size_t col_idx)
-{
-    vector v(A.m());
-    for (size_t i = 0; i < A.m(); i++)
-    {
-        v[i] = A(i, col_idx);
-    }
-    return v;
-}
-
-inline real_t abs(real_t v)
-{
-    return v >= 0 ? v : -v;
-    ;
-}
+inline real_t abs(real_t v) { return v >= 0 ? v : -v; }
 
 inline bool near_zero(real_t v1, real_t tol)
 {
