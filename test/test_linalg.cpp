@@ -16,11 +16,11 @@ TEST(test_linalg, QR_decomp_GMS)
                                });
         auto Q = A;
         auto R = matrix(3, 3);
-        QR_decomp_MGS(Q, R);
+        qr_decomp_mgs(Q, R);
         print(A);
         print(Q);
         print(R);
-        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
+        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
     }
     {
         auto A = create_matrix(3, 3,
@@ -32,11 +32,11 @@ TEST(test_linalg, QR_decomp_GMS)
                                });
         auto Q = A;
         auto R = matrix(3, 3);
-        QR_decomp_MGS(Q, R);
+        qr_decomp_mgs(Q, R);
         print(A);
         print(Q);
         print(R);
-        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
+        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
     }
     {
         auto A = create_matrix(4, 3,
@@ -49,10 +49,10 @@ TEST(test_linalg, QR_decomp_GMS)
                                });
         auto Q = A;
         auto R = matrix(3, 3);
-        QR_decomp_MGS(Q, R);
+        qr_decomp_mgs(Q, R);
         print(A);
         print(Q);
         print(R);
-        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
+        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
     }
 }

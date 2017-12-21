@@ -4,7 +4,7 @@
 #include "matvec_oper.hpp"
 namespace markovgg
 {
-void QR_decomp_MGS(matrix& AQ, matrix& R)
+void qr_decomp_mgs(matrix& AQ, matrix& R)
 {
     assert(AQ.n() <= AQ.m());
     assert(R.n() == R.m());

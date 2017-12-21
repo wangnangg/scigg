@@ -4,11 +4,11 @@ namespace markovgg
 {
 // QR decomposition using Modified Gram-Schmidt
 // A will be replaced by Q
-void QR_decomp_MGS(matrix& AQ, matrix& R);
+void qr_decomp_mgs(matrix& AQ, matrix& R);
 
 // QR decomposition using Householder Reflection
-void QR_decomp_HR();
+void qr_decomp_hr();
 
 // QR decomposition using Givens Rotation
-void QR_decomp_GR();
+void qr_decomp_gr();
 }

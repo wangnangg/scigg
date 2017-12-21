@@ -57,12 +57,17 @@ inline bool near_eq(real_t v1, real_t v2, real_t tol)
 }
 
 bool near_zero(const vector& v1, real_t tol);
-bool near_eq(const vector& v1, const vector& v2, real_t tol);
-bool near_eq(const matrix_const_view& M1, const matrix_const_view& M2,
-             real_t tol);
+bool near_eq(vector_const_view v1, vector_const_view v2, real_t tol);
+bool near_eq(matrix_const_view M1, matrix_const_view M2, real_t tol);
 
-// C = A * B
-void dot(const matrix_const_view& A, const matrix_const_view& B,
-         matrix_mutable_view& C);
-matrix dot(const matrix_const_view& A, const matrix_const_view& B);
+// y = A . x
+void dot(vector_mutable_view y, matrix_const_view A, bool transposeA,
+         vector_mutable_view x);
+vector dot(matrix_const_view A, bool transposeA, vector_mutable_view x);
+
+// C = A . B
+void dot(matrix_mutable_view C, matrix_const_view A, bool transposeA,
+         matrix_const_view B, bool transposeB);
+matrix dot(matrix_const_view A, bool transposeA, matrix_const_view B,
+           bool transposeB);
 }
