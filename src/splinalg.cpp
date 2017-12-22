@@ -40,7 +40,7 @@ real_t eigen_power_method(const spmatrix& A, bool transposeA,
     {
         for (int_t jj = 0; jj < check_interval; jj++)
         {
-            spblas_matrix_vector(1.0, A, transposeA, x, 0.0, x_next);
+            dot(x_next, A, transposeA, x);
             set_norm1(x_next, 1.0);
             std::swap(x_next, x);
         }
