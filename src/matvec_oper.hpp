@@ -60,6 +60,9 @@ bool near_eq(vector_const_view v1, vector_const_view v2, real_t tol);
 bool near_eq(matrix_const_view M1, matrix_const_view M2, real_t tol);
 
 void fill(vector_mutable_view x, real_t val);
+void fill(matrix_mutable_view A, real_t val);
+
+void set_diag(matrix_mutable_view A, real_t val);
 
 void set_norm1(vector_mutable_view vec, real_t val);
 void set_norm2(vector_mutable_view vec, real_t val);

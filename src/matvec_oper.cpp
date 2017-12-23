@@ -188,6 +188,27 @@ void fill(vector_mutable_view x, real_t val)
     }
 }
 
+void fill(matrix_mutable_view A, real_t val)
+{
+    for (size_t i = 0; i < A.m(); i++)
+    {
+        for (size_t j = 0; j < A.n(); j++)
+        {
+            A(i, j) = val;
+        }
+    }
+}
+
+void set_diag(matrix_mutable_view A, real_t val)
+{
+    fill(A, 0.0);
+    size_t iter = min(A.m(), A.n());
+    for (size_t i = 0; i < iter; i++)
+    {
+        A(i, i) = 1.0;
+    }
+}
+
 void set_norm1(vector_mutable_view vec, real_t val)
 {
     real_t n1 = blas_abs_sum(vec);

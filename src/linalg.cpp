@@ -1,7 +1,9 @@
 #include "linalg.hpp"
 #include <cassert>
 #include "blas.hpp"
+#include "debug_utils.hpp"
 #include "matvec_oper.hpp"
+
 namespace markovgg
 {
 void qr_decomp_mgs(matrix_mutable_view A, matrix_mutable_view R)
@@ -26,54 +28,95 @@ void qr_decomp_mgs(matrix_mutable_view A, matrix_mutable_view R)
     }
 }
 
-void qr_decomp_hr(matrix_mutable_view A, matrix_mutable_view V)
+// find vector v, with v[0] = 1, so that (I - tau v v') w zeros w[1:n]. v[1:n]
+// is stored in w[1:n] and w[0] = (Px)[0]
+real_t find_householder_vector(vector_mutable_view w)
+{
+    real_t wr = blas_norm2(w);
+    if (w[0] < 0)
+    {
+        wr = -wr;
+    }
+    w[0] += wr;
+    blas_scale(1.0 / w[0], w);
+    real_t vnorm = blas_norm2(w);
+    real_t tau = 2.0 / (vnorm * vnorm);
+    w[0] = -wr;
+    return tau;
+}
+
+// w = w - \tau vv'w, v[0] is ignored and v[0] = 1 is assumed. v will only be
+// changed temporarily.
+void apply_householder_reflector(vector_mutable_view w, real_t tau,
+                                 vector_mutable_view v)
+{
+    real_t v0 = v[0];
+    v[0] = 1;
+    real_t val = blas_dot(v, w);
+    blas_axpy(-tau * val, v, w);
+    v[0] = v0;
+}
+
+// A = A - \tau vv'A, v[0] is ignored and v[0] = 1 is assumed. v will only be
+// changed temporarily.
+void apply_householder_reflector(matrix_mutable_view A, real_t tau,
+                                 vector_mutable_view v)
+{
+    real_t v0 = v[0];
+    v[0] = 1;
+    vector vt_A(A.n());
+    blas_matrix_vector(1.0, A, true, v, 0.0, vt_A);
+    blas_rank1(-tau, v, vt_A, A);
+    v[0] = v0;
+}
+
+void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec)
 {
     assert(A.m() >= A.n());
-    assert(A.m() == V.m());
-    assert(A.n() == V.n());
+    assert(tau_vec.dim() == A.n());
     size_t m = A.m();
     size_t n = A.n();
     vector vks_A_(n);  // workspace
     for (size_t k = 0; k < n; k++)
     {
-        vector_const_view xk = matrix_col_const_view(A, k, k, m);
-        vector_mutable_view vk = matrix_col_mutable_view(V, k, k, m);
-        blas_copy(xk, vk);
-        real_t xnorm = blas_norm2(xk);
-        if (xk[0] < 0)
+        vector_mutable_view wk = matrix_col_mutable_view(A, k, k, m);
+        real_t tau = find_householder_vector(wk);
+        if (k < n - 1)
         {
-            xnorm = -xnorm;
+            matrix_mutable_view Ak = submatrix_mutable_view(A, k, k + 1);
+            apply_householder_reflector(Ak, tau, wk);
         }
-        vk[0] += xnorm;
-        set_norm2(vk, 1.0);
-        vector_mutable_view vks_Ak = subvector_mutable_view(vks_A_, k);
-        matrix_mutable_view Ak = submatrix_mutable_view(A, k, k);
-        // vks_Ak = vk' . Ak
-        blas_matrix_vector(1.0, Ak, true, vk, 0.0, vks_Ak);
-        // rank 1 update: Ak = -2 * vk * vks_Ak  + Ak
-        blas_rank1(-2.0, vk, vks_Ak, Ak);
+        tau_vec[k] = tau;
     }
 }
-
-void recover_q_from_v(matrix_const_view V, matrix_mutable_view Q)
+void unpack_qr(matrix_mutable_view QR, vector_const_view tau_vec,
+               matrix_mutable_view Q, matrix_mutable_view R)
 {
-    assert(V.m() == Q.m());
-    assert(Q.m() == Q.n());
-    size_t m = V.m();
-    size_t n = V.n();
-    for (size_t i = 0; i < m; i++)
+    assert(QR.m() == Q.m());
+    assert(QR.n() == Q.n());
+    assert(R.m() == R.n());
+    assert(R.m() == QR.n());
+    assert(QR.n() == tau_vec.dim());
+    size_t m = QR.m();
+    size_t n = QR.n();
+    fill(Q, 0.0);
+    set_diag(Q, 1.0);
+    for (size_t i = 0; i < n; i++)
     {
-        vector_mutable_view qi = matrix_col_mutable_view(Q, i);
-        fill(qi, 0.0);
-        qi[i] = 1.0;
-        size_t num_ref = min(n, i + 1);
-        for (size_t j = 0; j < num_ref; j++)
+        size_t k = n - i - 1;
+        auto vk = matrix_col_mutable_view(QR, k, k, m);
+        auto Qk = submatrix_mutable_view(Q, k, k);
+        apply_householder_reflector(Qk, tau_vec[k], vk);
+    }
+    for (size_t i = 0; i < n; i++)
+    {
+        for (size_t j = 0; j < i; j++)
         {
-            size_t k = num_ref - j - 1;
-            auto vk = matrix_col_const_view(V, k, k, m);
-            auto qi_k = subvector_mutable_view(qi, k, m);
-            real_t alpha = -2 * blas_dot(qi_k, vk);
-            blas_axpy(alpha, vk, qi_k);
+            R(i, j) = 0.0;
+        }
+        for (size_t j = i; j < n; j++)
+        {
+            R(i, j) = QR(i, j);
         }
     }
 }
