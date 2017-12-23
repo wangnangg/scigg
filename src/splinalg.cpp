@@ -23,12 +23,6 @@ real_t max_diff(vector_const_view v1, vector_const_view v2)
     return max;
 }
 
-void set_norm1(vector_mutable_view vec, real_t val)
-{
-    real_t n1 = blas_abs_sum(vec);
-    blas_scale(val / n1, vec);
-}
-
 real_t eigen_power_method(const spmatrix& A, bool transposeA,
                           vector_mutable_view x, real_t tol, int_t max_iter,
                           int_t check_interval)

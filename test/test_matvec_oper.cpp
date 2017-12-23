@@ -14,10 +14,10 @@ TEST(test_matvec_oper, submatrix)
                                  7, 2, 9,  //
                                  7, 2, 9,  //
                              });
-    auto A_c_m_v = col_mutable_view(A, 1);
-    auto A_c_c_v = col_const_view(A, 1);
-    auto A_r_m_v = row_mutable_view(A, 1);
-    auto A_r_c_v = row_const_view(A, 1);
+    auto A_c_m_v = matrix_col_const_view(A, 1);
+    auto A_c_c_v = matrix_col_mutable_view(A, 1);
+    auto A_r_m_v = matrix_row_mutable_view(A, 1);
+    auto A_r_c_v = matrix_row_const_view(A, 1);
     print(A_c_m_v);
     print(A_c_c_v);
     print(A_r_m_v);

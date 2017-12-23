@@ -42,8 +42,10 @@ void blas_matrix_vector(real_t alpha, matrix_const_view A, bool transposeA,
                         vector_const_view x, real_t beta,
                         vector_mutable_view y);
 
-// rank 1 or 2 op, omitted
-// A = alpha * x * y' + A
+// A = alpha*x*y' +  A
+void blas_rank1(real_t alpha, vector_const_view x, vector_const_view y,
+                matrix_mutable_view A);
+// rank 2 op, omitted
 // A = alpha * x * y' + beta * y * x' + A
 
 // level 3 blas

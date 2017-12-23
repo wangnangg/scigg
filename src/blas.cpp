@@ -79,6 +79,14 @@ void blas_matrix_vector(real_t alpha, matrix_const_view A, bool transposeA,
                 y.inc());
 }
 
+// A = alpha*x*y' +  A
+void blas_rank1(real_t alpha, vector_const_view x, vector_const_view y,
+                matrix_mutable_view A)
+{
+    cblas_dger(CblasRowMajor, A.m(), A.n(), alpha, &x[0], x.inc(), &y[0],
+               y.inc(), &A(0, 0), A.ldim());
+}
+
 // rank 1 or 2 op, omitted
 // A = alpha * x * y' + A
 // A = alpha * x * y' + beta * y * x' + A
