@@ -3,9 +3,9 @@
 #include "common.hpp"
 #include "debug_utils.hpp"
 #include "gtest/gtest.h"
-#include "matvec_oper.hpp"
+#include "matrix.hpp"
 
-TEST(test_matvec_oper, submatrix)
+TEST(test_matrix, submatrix)
 {
     {
         matrix A = create_matrix(4, 3,

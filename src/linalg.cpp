@@ -13,13 +13,13 @@ void qr_decomp_mgs(matrix_mutable_view A, matrix_mutable_view R)
     assert(A.n() == R.m());
     for (size_t i = 0; i < A.n(); i++)
     {
-        auto qi = matrix_col_mutable_view(A, i);
+        auto qi = A.col(i);
         real_t rii = blas_norm2(qi);
         blas_scale(1.0 / rii, qi);
         R(i, i) = rii;
         for (size_t j = i + 1; j < A.n(); j++)
         {
-            auto vj = matrix_col_mutable_view(A, j);
+            auto vj = A.col(j);
             real_t rij = blas_dot(qi, vj);
             // vj = vj - rjj * qi
             blas_axpy(-rij, qi, vj);
@@ -79,11 +79,11 @@ void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec)
     vector vks_A_(n);  // workspace
     for (size_t k = 0; k < n; k++)
     {
-        vector_mutable_view wk = matrix_col_mutable_view(A, k, k, m);
+        auto wk = A.col(k).sub(k);
         real_t tau = find_householder_vector(wk);
         if (k < n - 1)
         {
-            matrix_mutable_view Ak = submatrix_mutable_view(A, k, k + 1);
+            auto Ak = A.sub(k, k + 1);
             apply_householder_reflector(Ak, tau, wk);
         }
         tau_vec[k] = tau;
@@ -104,8 +104,8 @@ void unpack_qr(matrix_mutable_view QR, vector_const_view tau_vec,
     for (size_t i = 0; i < n; i++)
     {
         size_t k = n - i - 1;
-        auto vk = matrix_col_mutable_view(QR, k, k, m);
-        auto Qk = submatrix_mutable_view(Q, k, k);
+        auto vk = QR.col(k).sub(k);
+        auto Qk = Q.sub(k, k);
         apply_householder_reflector(Qk, tau_vec[k], vk);
     }
     for (size_t i = 0; i < n; i++)

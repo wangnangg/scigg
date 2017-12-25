@@ -145,4 +145,15 @@ real_t linsv_sor_method(const spmatrix& A, bool transposeA,
     }
     return max_diff(x_next, x);
 }
+
+// solve Ax = b, A must be full rank.
+real_t linsv_gmres(const spmatrix& A, bool transposeA, vector_mutable_view x,
+                   vector_const_view b,
+                   size_t m,  // dim of krylov space
+                   real_t tol)
+{
+    assert(A.m() == A.n());
+    size_t n = A.n();
+    matrix H(m, n);
+}
 }

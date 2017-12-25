@@ -2,28 +2,6 @@
 #include "blas.hpp"
 namespace markovgg
 {
-matrix create_matrix(size_t m, size_t n, const std::vector<double>& v)
-{
-    assert(m * n == v.size());
-    matrix M(m, n);
-    for (size_t i = 0; i < m; i++)
-    {
-        for (size_t j = 0; j < n; j++)
-        {
-            M(i, j) = v[i * n + j];
-        }
-    }
-    return M;
-}
-vector create_vector(size_t n, const std::vector<double>& v)
-{
-    vector vo(n);
-    for (size_t i = 0; i < n; i++)
-    {
-        vo[i] = v[i];
-    }
-    return vo;
-}
 vector_const_view matrix_row_const_view(matrix_const_view A, size_t row_idx,
                                         size_t start_col, size_t end_col)
 {
@@ -110,27 +88,6 @@ matrix_const_view submatrix_const_view(matrix_const_view A, size_t start_row,
     size_t m = end_row - start_row;
     size_t n = end_col - start_col;
     return matrix_const_view(&A(start_row, start_col), m, n, A.ldim());
-}
-
-vector_const_view subvector_const_view(vector_const_view v, size_t start_idx,
-                                       size_t end_idx)
-{
-    assert(end_idx <= v.dim());
-    if (end_idx == 0)
-    {
-        end_idx = v.dim();
-    }
-    return vector_const_view(&v[start_idx], end_idx - start_idx, v.inc());
-}
-vector_mutable_view subvector_mutable_view(vector_mutable_view v,
-                                           size_t start_idx, size_t end_idx)
-{
-    assert(end_idx <= v.dim());
-    if (end_idx == 0)
-    {
-        end_idx = v.dim();
-    }
-    return vector_mutable_view(&v[start_idx], end_idx - start_idx, v.inc());
 }
 
 bool near_zero(vector_const_view v1, real_t tol)
