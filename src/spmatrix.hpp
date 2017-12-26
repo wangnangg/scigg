@@ -88,7 +88,7 @@ class spmatrix_creator
     size_t _n;
 
 public:
-    spmatrix_creator(size_t m, size_t n) : _m(m), _n(n), _data() {}
+    spmatrix_creator(size_t m, size_t n) : _data(), _m(m), _n(n) {}
     void add_entry(size_t row, size_t col, real_t val)
     {
         _data.push_back(spmat_triplet_entry{row, col, val});

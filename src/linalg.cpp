@@ -73,9 +73,7 @@ void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec)
 {
     assert(A.m() >= A.n());
     assert(tau_vec.dim() == A.n());
-    size_t m = A.m();
     size_t n = A.n();
-    vector vks_A_(n);  // workspace
     for (size_t k = 0; k < n; k++)
     {
         auto wk = A.col(k).sub(k);
@@ -96,7 +94,6 @@ void unpack_qr(matrix_mutable_view QR, vector_const_view tau_vec,
     assert(R.m() == R.n());
     assert(R.m() == QR.n());
     assert(QR.n() == tau_vec.dim());
-    size_t m = QR.m();
     size_t n = QR.n();
     fill(Q, 0.0);
     set_diag(Q, 1.0);
