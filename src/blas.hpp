@@ -35,6 +35,8 @@ void blas_axpy(real_t a, vector_const_view x, vector_mutable_view y);
 
 // x = ax
 void blas_scale(real_t alpha, vector_mutable_view v);
+// A = aA
+void blas_scale(real_t alpha, matrix_mutable_view A);
 
 // level 2 blas
 // y = alpha * A * x + beta * y

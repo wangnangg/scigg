@@ -47,8 +47,6 @@ bool near_eq(matrix_const_view M1, matrix_const_view M2, real_t tol)
     return true;
 }
 
-void inc(vector_mutable_view y, vector_const_view x) { blas_axpy(1.0, x, y); }
-void dec(vector_mutable_view y, vector_const_view x) { blas_axpy(-1.0, x, y); }
 void fill(vector_mutable_view x, real_t val)
 {
     for (size_t i = 0; i < x.dim(); i++)
@@ -78,27 +76,46 @@ void set_diag(matrix_mutable_view A, real_t val)
     }
 }
 
-void set_norm1(vector_mutable_view vec, real_t val)
+void add(vector_mutable_view z, vector_const_view x, vector_const_view y)
 {
-    real_t n1 = blas_abs_sum(vec);
-    blas_scale(val / n1, vec);
+    assert(z.dim() == x.dim());
+    assert(z.dim() == y.dim());
+    for (size_t i = 0; i < z.dim(); i++)
+    {
+        z[i] = x[i] + y[i];
+    }
 }
 
-void set_norm2(vector_mutable_view vec, real_t val)
+void inc(vector_mutable_view z, vector_const_view x)
 {
-    real_t n2 = blas_norm2(vec);
-    blas_scale(val / n2, vec);
+    // z = x + z
+    blas_axpy(1.0, x, z);
 }
 
+void sub(vector_mutable_view z, vector_const_view x, vector_const_view y)
+{
+    assert(z.dim() == x.dim());
+    assert(z.dim() == y.dim());
+    for (size_t i = 0; i < z.dim(); i++)
+    {
+        z[i] = x[i] - y[i];
+    }
+}
+
+void dec(vector_mutable_view z, vector_const_view x)
+{
+    // z = - x + z
+    blas_axpy(-1.0, x, z);
+}
+real_t dot(vector_const_view x, vector_const_view y) { return blas_dot(x, y); }
+
+void dot(vector_mutable_view z, matrix_const_view A, vector_const_view x)
+{
+    blas_matrix_vector(1.0, A, x, 0.0, z);
+}
 // C = A * B
 void dot(matrix_mutable_view C, matrix_const_view A, matrix_const_view B)
 {
     blas_matrix_matrix(1.0, A, B, 0.0, C);
-}
-matrix dot(matrix_const_view A, matrix_const_view B)
-{
-    auto C = matrix(A.m(), B.n());
-    blas_matrix_matrix(1.0, A, B, 0.0, C);
-    return C;
 }
 }

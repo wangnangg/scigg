@@ -14,13 +14,13 @@ void qr_decomp_mgs(matrix_mutable_view A, matrix_mutable_view R)
     for (size_t i = 0; i < A.n(); i++)
     {
         auto qi = A.col(i);
-        real_t rii = blas_norm2(qi);
-        blas_scale(1.0 / rii, qi);
+        real_t rii = norm2(qi);
+        scale(qi, 1.0 / rii);
         R(i, i) = rii;
         for (size_t j = i + 1; j < A.n(); j++)
         {
             auto vj = A.col(j);
-            real_t rij = blas_dot(qi, vj);
+            real_t rij = dot(qi, vj);
             // vj = vj - rjj * qi
             blas_axpy(-rij, qi, vj);
             R(i, j) = rij;
@@ -32,14 +32,14 @@ void qr_decomp_mgs(matrix_mutable_view A, matrix_mutable_view R)
 // is stored in w[1:n] and w[0] = (Px)[0]
 real_t find_householder_vector(vector_mutable_view w)
 {
-    real_t wr = blas_norm2(w);
+    real_t wr = norm2(w);
     if (w[0] < 0)
     {
         wr = -wr;
     }
     w[0] += wr;
-    blas_scale(1.0 / w[0], w);
-    real_t vnorm = blas_norm2(w);
+    scale(w, 1.0 / w[0]);
+    real_t vnorm = norm2(w);
     real_t tau = 2.0 / (vnorm * vnorm);
     w[0] = -wr;
     return tau;
@@ -52,7 +52,7 @@ void apply_householder_reflector(vector_mutable_view w, real_t tau,
 {
     real_t v0 = v[0];
     v[0] = 1;
-    real_t val = blas_dot(v, w);
+    real_t val = dot(v, w);
     blas_axpy(-tau * val, v, w);
     v[0] = v0;
 }
@@ -64,8 +64,7 @@ void apply_householder_reflector(matrix_mutable_view A, real_t tau,
 {
     real_t v0 = v[0];
     v[0] = 1;
-    vector vt_A(A.n());
-    blas_matrix_vector(1.0, A.transpose(), v, 0.0, vt_A);
+    auto vt_A = v * A;
     blas_rank1(-tau, v, vt_A, A);
     v[0] = v0;
 }

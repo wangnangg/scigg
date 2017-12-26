@@ -34,23 +34,103 @@ void fill(matrix_mutable_view A, real_t val);
 
 void set_diag(matrix_mutable_view A, real_t val);
 
-void set_norm1(vector_mutable_view vec, real_t val);
-void set_norm2(vector_mutable_view vec, real_t val);
+inline void scale(vector_mutable_view x, real_t alpha) { blas_scale(alpha, x); }
 
-// y = x + y
-void inc(vector_mutable_view y, vector_const_view x);
-// y = x - y
-void dec(vector_mutable_view y, vector_const_view x);
-// x' * y
-inline real_t dot(vector_const_view x, vector_const_view y)
+inline void scale(matrix_mutable_view A, real_t alpha) { blas_scale(alpha, A); }
+
+inline real_t norm1(vector_const_view vec) { return blas_abs_sum(vec); }
+
+inline real_t norm2(vector_const_view vec) { return blas_norm2(vec); }
+
+inline void set_norm1(vector_mutable_view vec, real_t val)
 {
-    return blas_dot(x, y);
+    real_t n1 = norm1(vec);
+    scale(vec, val / n1);
 }
-// y = A . x
-void dot(vector_mutable_view y, matrix_const_view A, vector_mutable_view x);
-vector dot(matrix_const_view A, vector_mutable_view x);
+inline void set_norm2(vector_mutable_view vec, real_t val)
+{
+    real_t n2 = norm2(vec);
+    scale(vec, val / n2);
+}
 
-// C = A . B
+// add z = x + y
+void add(vector_mutable_view z, vector_const_view x, vector_const_view y);
+inline vector add(vector_const_view x, vector_const_view y)
+{
+    vector z(x.dim());
+    add(z, x, y);
+    return z;
+}
+inline vector operator+(vector_const_view x, vector_const_view y)
+{
+    return add(x, y);
+}
+
+// inc z += x
+void inc(vector_mutable_view z, vector_const_view x);
+inline vector_mutable_view operator+=(vector_mutable_view z,
+                                      vector_const_view x)
+{
+    inc(z, x);
+    return z;
+}
+
+// add z = x - y
+void sub(vector_mutable_view z, vector_const_view x, vector_const_view y);
+inline vector sub(vector_const_view x, vector_const_view y)
+{
+    vector z(x.dim());
+    sub(z, x, y);
+    return z;
+}
+inline vector operator-(vector_const_view x, vector_const_view y)
+{
+    return sub(x, y);
+}
+
+// z -= x
+void dec(vector_mutable_view z, vector_const_view x);
+inline vector_mutable_view operator-=(vector_mutable_view z,
+                                      vector_const_view x)
+{
+    dec(z, x);
+    return z;
+}
+
+// dot x * y
+real_t dot(vector_const_view x, vector_const_view y);
+inline real_t operator*(vector_const_view x, vector_const_view y)
+{
+    return dot(x, y);
+}
+
+// dot z = A . x
+void dot(vector_mutable_view z, matrix_const_view A, vector_const_view x);
+inline vector dot(matrix_const_view A, vector_const_view x)
+{
+    vector z(A.m());
+    dot(z, A, x);
+    return z;
+}
+inline vector operator*(matrix_const_view A, vector_const_view x)
+{
+    return dot(A, x);
+}
+inline vector operator*(vector_const_view x, matrix_const_view A)
+{
+    return dot(A.transpose(), x);
+}
+
+// dot C = A . B
 void dot(matrix_mutable_view C, matrix_const_view A, matrix_const_view B);
-matrix dot(matrix_const_view A, matrix_const_view B);
+inline matrix dot(matrix_const_view A, matrix_const_view B)
+{
+    matrix C(A.m(), B.n());
+    dot(C, A, B);
+    return C;
+}
+inline matrix operator*(matrix_const_view A, matrix_const_view B)
+{
+    return dot(A, B);
+}
 }
