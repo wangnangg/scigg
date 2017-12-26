@@ -19,6 +19,16 @@ std::ostream& operator<<(std::ostream& os, const matrix_const_view& mat)
     }
     return os;
 }
+std::ostream& operator<<(std::ostream& os, const matrix& mat)
+{
+    auto m = matrix_const_view(mat);
+    return os << m;
+}
+std::ostream& operator<<(std::ostream& os, const matrix_mutable_view& mat)
+{
+    auto m = matrix_const_view(mat);
+    return os << m;
+}
 
 std::ostream& operator<<(std::ostream& os, const vector_const_view& v)
 {

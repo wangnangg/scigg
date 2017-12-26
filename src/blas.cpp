@@ -92,8 +92,8 @@ void blas_matrix_matrix(real_t alpha, matrix_const_view A, matrix_const_view B,
     assert(A.m() == C.m());
     assert(B.n() == C.n());
     bool transA = A.is_col_major() != C.is_col_major();
-    bool transB = B.is_col_major() != B.is_col_major();
-    cblas_dgemm(A.is_col_major() ? CblasColMajor : CblasRowMajor,
+    bool transB = B.is_col_major() != C.is_col_major();
+    cblas_dgemm(C.is_col_major() ? CblasColMajor : CblasRowMajor,
                 transA ? CblasTrans : CblasNoTrans,
                 transB ? CblasTrans : CblasNoTrans, C.m(), C.n(), A.n(), alpha,
                 &A(0, 0), A.ldim(), &B(0, 0), B.ldim(), beta, &C(0, 0),

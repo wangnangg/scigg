@@ -53,64 +53,198 @@ TEST(test_blas, level1)
 
 TEST(test_blas, level2)
 {
-    matrix M = create_matrix(4, 5,
-                             {
-                                 1,  2,  3,  4,  5,   //
-                                 6,  7,  8,  9,  10,  //
-                                 11, 12, 13, 14, 15,  //
-                                 16, 17, 18, 19, 20   //
-                             });
+    const matrix M = create_matrix(4, 5,
+                                   {
+                                       1,  2,  3,  4,  5,   //
+                                       6,  7,  8,  9,  10,  //
+                                       11, 12, 13, 14, 15,  //
+                                       16, 17, 18, 19, 20   //
+                                   });
+    const matrix MT = create_matrix(5, 4,
+                                    {
+                                        1, 6,  11, 16,  //
+                                        2, 7,  12, 17,  //
+                                        3, 8,  13, 18,  //
+                                        4, 9,  14, 19,  //
+                                        5, 10, 15, 20   //
+                                    });
+    ASSERT_EQ(M.transpose(), MT);
 
-    vector x = create_vector(5, {5, 4, 3, 2, 1});
-    vector y = create_vector(4, {-1, -2, -3, -4});
-    print(M);
-    // y = 2.0 * M * x + 3.0 * y
-    blas_matrix_vector(2.0, M, x, 3.0, y);
-    print(y);
-    ASSERT_EQ(y, create_vector(4, {67, 214, 361, 508}));
-
-    x = create_vector(5, {5, 4, 3, 2, 1});
-    y = create_vector(4, {-1, -2, -3, -4});
-    auto Mt = M.transpose();
-    print(Mt);
-    blas_matrix_vector(2.0, Mt, y, 3.0, x);
-    print(x);
-    ASSERT_EQ(x, create_vector(5, {-205, -228, -251, -274, -297}));
+    {
+        vector x = create_vector(5, {5, 4, 3, 2, 1});
+        vector y = create_vector(4, {-1, -2, -3, -4});
+        // y = 2.0 * M * x + 3.0 * y
+        blas_matrix_vector(2.0, M, x, 3.0, y);
+        ASSERT_EQ(y, create_vector(4, {67, 214, 361, 508}));
+    }
+    {
+        vector x = create_vector(5, {5, 4, 3, 2, 1});
+        vector y = create_vector(4, {-1, -2, -3, -4});
+        // y = 2.0 * M * x + 3.0 * y
+        blas_matrix_vector(2.0, MT.transpose(), x, 3.0, y);
+        ASSERT_EQ(y, create_vector(4, {67, 214, 361, 508}));
+    }
+    {
+        vector x = create_vector(5, {5, 4, 3, 2, 1});
+        vector y = create_vector(4, {-1, -2, -3, -4});
+        blas_matrix_vector(2.0, M.transpose(), y, 3.0, x);
+        ASSERT_EQ(x, create_vector(5, {-205, -228, -251, -274, -297}));
+    }
+    {
+        vector x = create_vector(5, {5, 4, 3, 2, 1});
+        vector y = create_vector(4, {-1, -2, -3, -4});
+        blas_matrix_vector(2.0, MT, y, 3.0, x);
+        ASSERT_EQ(x, create_vector(5, {-205, -228, -251, -274, -297}));
+    }
 }
 
 TEST(test_blas, level3)
 {
-    matrix A = create_matrix(4, 5,
-                             {
-                                 1,  2,  3,  4,  5,   //
-                                 6,  7,  8,  9,  10,  //
-                                 11, 12, 13, 14, 15,  //
-                                 16, 17, 18, 19, 20   //
-                             });
-    matrix B = create_matrix(5, 3,
-                             {
-                                 1, -2, 3,   //
-                                 6, -6, 8,   //
-                                 11, 5, 13,  //
-                                 16, 4, 18,  //
-                                 1, -4, -3,  //
-                             });
-    matrix C = create_matrix(4, 3,
-                             {
-                                 1, 1, 1,   //
-                                 2, 2, 2,   //
-                                 3, 5, 13,  //
-                                 4, 4, 18,  //
-                             });
+    const matrix A_ = create_matrix(4, 5,
+                                    {
+                                        1,  2,  3,  4,  5,   //
+                                        6,  7,  8,  9,  10,  //
+                                        11, 12, 13, 14, 15,  //
+                                        16, 17, 18, 19, 20   //
+                                    });
 
-    // C = alpha * A * B + beta * C
-    blas_matrix_matrix(2.0, A, B, 3.0, C);
-    print(C);
-    ASSERT_EQ(C, create_matrix(4, 3,
-                               {
-                                   233, -3, 233,     //
-                                   586, -30, 626,    //
-                                   939, -51, 1049,   //
-                                   1292, -84., 1454  //
-                               }));
+    const matrix AT_ = create_matrix(5, 4,
+                                     {
+                                         1, 6,  11, 16,  //
+                                         2, 7,  12, 17,  //
+                                         3, 8,  13, 18,  //
+                                         4, 9,  14, 19,  //
+                                         5, 10, 15, 20   //
+                                     });
+    ASSERT_EQ(A_, AT_.transpose());
+    ASSERT_EQ(A_.transpose(), AT_);
+    const matrix B_ = create_matrix(5, 3,
+                                    {
+                                        1, -2, 3,   //
+                                        6, -6, 8,   //
+                                        11, 5, 13,  //
+                                        16, 4, 18,  //
+                                        1, -4, -3,  //
+                                    });
+    const matrix BT_ = create_matrix(3, 5,
+                                     {
+                                         1, 6, 11, 16, 1,   //
+                                         -2, -6, 5, 4, -4,  //
+                                         3, 8, 13, 18, -3   //
+                                     });
+    ASSERT_EQ(B_, BT_.transpose());
+    ASSERT_EQ(B_.transpose(), BT_);
+    const matrix C_ = create_matrix(4, 3,
+                                    {
+                                        1, 1, 1,   //
+                                        2, 2, 2,   //
+                                        3, 5, 13,  //
+                                        4, 4, 18,  //
+                                    });
+    const matrix CT_ = create_matrix(3, 4,
+                                     {
+                                         1, 2, 3, 4,    //
+                                         1, 2, 5, 4,    //
+                                         1, 2, 13, 18,  //
+                                     });
+    ASSERT_EQ(C_, CT_.transpose());
+    ASSERT_EQ(C_.transpose(), CT_);
+
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = C_;
+        blas_matrix_matrix(2.0, A_, B_, 3.0, C);
+        ASSERT_EQ(C, create_matrix(4, 3,
+                                   {
+                                       233, -3, 233,     //
+                                       586, -30, 626,    //
+                                       939, -51, 1049,   //
+                                       1292, -84., 1454  //
+                                   }));
+    }
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = C_;
+        blas_matrix_matrix(2.0, AT_.transpose(), B_, 3.0, C);
+        ASSERT_EQ(C, create_matrix(4, 3,
+                                   {
+                                       233, -3, 233,     //
+                                       586, -30, 626,    //
+                                       939, -51, 1049,   //
+                                       1292, -84., 1454  //
+                                   }));
+    }
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = C_;
+        blas_matrix_matrix(2.0, A_, BT_.transpose(), 3.0, C);
+        ASSERT_EQ(C, create_matrix(4, 3,
+                                   {
+                                       233, -3, 233,     //
+                                       586, -30, 626,    //
+                                       939, -51, 1049,   //
+                                       1292, -84., 1454  //
+                                   }));
+    }
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = C_;
+        blas_matrix_matrix(2.0, AT_.transpose(), BT_.transpose(), 3.0, C);
+        ASSERT_EQ(C, create_matrix(4, 3,
+                                   {
+                                       233, -3, 233,     //
+                                       586, -30, 626,    //
+                                       939, -51, 1049,   //
+                                       1292, -84., 1454  //
+                                   }));
+    }
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = CT_;
+        blas_matrix_matrix(2.0, A_, B_, 3.0, C.transpose());
+        ASSERT_EQ(C.transpose(), create_matrix(4, 3,
+                                               {
+                                                   233, -3, 233,     //
+                                                   586, -30, 626,    //
+                                                   939, -51, 1049,   //
+                                                   1292, -84., 1454  //
+                                               }));
+    }
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = CT_;
+        blas_matrix_matrix(2.0, AT_.transpose(), B_, 3.0, C.transpose());
+        ASSERT_EQ(C.transpose(), create_matrix(4, 3,
+                                               {
+                                                   233, -3, 233,     //
+                                                   586, -30, 626,    //
+                                                   939, -51, 1049,   //
+                                                   1292, -84., 1454  //
+                                               }));
+    }
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = CT_;
+        blas_matrix_matrix(2.0, A_, BT_.transpose(), 3.0, C.transpose());
+        ASSERT_EQ(C.transpose(), create_matrix(4, 3,
+                                               {
+                                                   233, -3, 233,     //
+                                                   586, -30, 626,    //
+                                                   939, -51, 1049,   //
+                                                   1292, -84., 1454  //
+                                               }));
+    }
+    {
+        // C = alpha * A * B + beta * C
+        matrix C = CT_;
+        blas_matrix_matrix(2.0, AT_.transpose(), BT_.transpose(), 3.0,
+                           C.transpose());
+        ASSERT_EQ(C.transpose(), create_matrix(4, 3,
+                                               {
+                                                   233, -3, 233,     //
+                                                   586, -30, 626,    //
+                                                   939, -51, 1049,   //
+                                                   1292, -84., 1454  //
+                                               }));
+    }
 }
