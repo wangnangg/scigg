@@ -54,12 +54,12 @@ std::ostream& operator<<(std::ostream& os, const spmatrix& mat)
 
 std::ostream& operator<<(std::ostream& os, const spmat_cs_entry& e)
 {
-    std::cout << "{" << e.idx << ", " << e.val << "}";
+    return std::cout << "{" << e.idx << ", " << e.val << "}";
 }
 
 std::ostream& operator<<(std::ostream& os, const spmat_triplet_entry& e)
 {
-    std::cout << "{" << e.row << ", " << e.col << ", " << e.val << "}";
+    return std::cout << "{" << e.row << ", " << e.col << ", " << e.val << "}";
 }
 timed_scope::timed_scope(const char* name)
 {

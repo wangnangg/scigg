@@ -3,27 +3,27 @@
 namespace markovgg
 {
 matrix_mutable_view::matrix_mutable_view(matrix& M)
-    : matrix_mutable_view(&M(0, 0), M.m(), M.n(), M.ldim())
+    : matrix_mutable_view(&M(0, 0), M.m(), M.n(), M.ldim(), M.is_col_major())
 {
 }
 
 matrix_const_view::matrix_const_view(const matrix& M)
-    : matrix_const_view(&M(0, 0), M.m(), M.n(), M.ldim())
+    : matrix_const_view(&M(0, 0), M.m(), M.n(), M.ldim(), M.is_col_major())
 {
 }
 matrix_const_view::matrix_const_view(matrix_mutable_view M)
-    : matrix_const_view(&M(0, 0), M.m(), M.n(), M.ldim())
+    : matrix_const_view(&M(0, 0), M.m(), M.n(), M.ldim(), M.is_col_major())
 {
 }
 
 vector_mutable_view matrix_mutable_view::row(size_t row_idx) const
 {
-    return vector_mutable_view(&operator()(row_idx, 0), n(), 1);
+    return vector_mutable_view(&operator()(row_idx, 0), n(), _col_step);
 }
 
 vector_mutable_view matrix_mutable_view::col(size_t col_idx) const
 {
-    return vector_mutable_view(&operator()(0, col_idx), m(), ldim());
+    return vector_mutable_view(&operator()(0, col_idx), m(), _row_step);
 }
 
 matrix_mutable_view matrix_mutable_view::sub(size_t start_row, size_t start_col,
@@ -42,17 +42,18 @@ matrix_mutable_view matrix_mutable_view::sub(size_t start_row, size_t start_col,
     }
     size_t m = end_row - start_row;
     size_t n = end_col - start_col;
-    return matrix_mutable_view(&operator()(start_row, start_col), m, n, ldim());
+    return matrix_mutable_view(&operator()(start_row, start_col), m, n, ldim(),
+                               is_col_major());
 }
 
 vector_const_view matrix_const_view::row(size_t row_idx) const
 {
-    return vector_const_view(&operator()(row_idx, 0), n(), 1);
+    return vector_const_view(&operator()(row_idx, 0), n(), _col_step);
 }
 
 vector_const_view matrix_const_view::col(size_t col_idx) const
 {
-    return vector_const_view(&operator()(0, col_idx), m(), ldim());
+    return vector_const_view(&operator()(0, col_idx), m(), _row_step);
 }
 
 matrix_const_view matrix_const_view::sub(size_t start_row, size_t start_col,
@@ -70,17 +71,18 @@ matrix_const_view matrix_const_view::sub(size_t start_row, size_t start_col,
     }
     size_t m = end_row - start_row;
     size_t n = end_col - start_col;
-    return matrix_const_view(&operator()(start_row, start_col), m, n, ldim());
+    return matrix_const_view(&operator()(start_row, start_col), m, n, ldim(),
+                             is_col_major());
 }
 
 vector_const_view matrix::row(size_t row_idx) const
 {
-    return vector_const_view(&operator()(row_idx, 0), n(), 1);
+    return vector_const_view(&operator()(row_idx, 0), n(), _col_step);
 }
 
 vector_const_view matrix::col(size_t col_idx) const
 {
-    return vector_const_view(&operator()(0, col_idx), m(), ldim());
+    return vector_const_view(&operator()(0, col_idx), m(), _row_step);
 }
 
 matrix_const_view matrix::sub(size_t start_row, size_t start_col,
@@ -98,17 +100,18 @@ matrix_const_view matrix::sub(size_t start_row, size_t start_col,
     }
     size_t m = end_row - start_row;
     size_t n = end_col - start_col;
-    return matrix_const_view(&operator()(start_row, start_col), m, n, ldim());
+    return matrix_const_view(&operator()(start_row, start_col), m, n, ldim(),
+                             is_col_major());
 }
 
 vector_mutable_view matrix::row(size_t row_idx)
 {
-    return vector_mutable_view(&operator()(row_idx, 0), n(), 1);
+    return vector_mutable_view(&operator()(row_idx, 0), n(), _col_step);
 }
 
 vector_mutable_view matrix::col(size_t col_idx)
 {
-    return vector_mutable_view(&operator()(0, col_idx), m(), ldim());
+    return vector_mutable_view(&operator()(0, col_idx), m(), _row_step);
 }
 
 matrix_mutable_view matrix::sub(size_t start_row, size_t start_col,
@@ -126,7 +129,8 @@ matrix_mutable_view matrix::sub(size_t start_row, size_t start_col,
     }
     size_t m = end_row - start_row;
     size_t n = end_col - start_col;
-    return matrix_mutable_view(&operator()(start_row, start_col), m, n, ldim());
+    return matrix_mutable_view(&operator()(start_row, start_col), m, n, ldim(),
+                               is_col_major());
 }
 
 bool operator==(matrix_const_view m1, matrix_const_view m2)

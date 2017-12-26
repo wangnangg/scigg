@@ -61,30 +61,22 @@ void blas_scale(real_t alpha, vector_mutable_view v)
 // level 2 blas
 
 // y = alpha * A * x + beta * y
-void blas_matrix_vector(real_t alpha, matrix_const_view A, bool transposeA,
-                        vector_const_view x, real_t beta, vector_mutable_view y)
+void blas_matrix_vector(real_t alpha, matrix_const_view A, vector_const_view x,
+                        real_t beta, vector_mutable_view y)
 {
-    if (!transposeA)
-    {
-        assert(A.n() == x.dim());
-        assert(A.m() == y.dim());
-    }
-    else
-    {
-        assert(A.m() == x.dim());
-        assert(A.n() == y.dim());
-    }
-    cblas_dgemv(CblasRowMajor, transposeA ? CblasTrans : CblasNoTrans, A.m(),
-                A.n(), alpha, &A(0, 0), A.ldim(), &x[0], x.inc(), beta, &y[0],
-                y.inc());
+    assert(A.n() == x.dim());
+    assert(A.m() == y.dim());
+    cblas_dgemv(A.is_col_major() ? CblasColMajor : CblasRowMajor, CblasNoTrans,
+                A.m(), A.n(), alpha, &A(0, 0), A.ldim(), &x[0], x.inc(), beta,
+                &y[0], y.inc());
 }
 
 // A = alpha*x*y' +  A
 void blas_rank1(real_t alpha, vector_const_view x, vector_const_view y,
                 matrix_mutable_view A)
 {
-    cblas_dger(CblasRowMajor, A.m(), A.n(), alpha, &x[0], x.inc(), &y[0],
-               y.inc(), &A(0, 0), A.ldim());
+    cblas_dger(A.is_col_major() ? CblasColMajor : CblasRowMajor, A.m(), A.n(),
+               alpha, &x[0], x.inc(), &y[0], y.inc(), &A(0, 0), A.ldim());
 }
 
 // rank 1 or 2 op, omitted
@@ -93,17 +85,17 @@ void blas_rank1(real_t alpha, vector_const_view x, vector_const_view y,
 
 // level 3 blas
 // C = alpha * A * B + beta * C
-void blas_matrix_matrix(real_t alpha, matrix_const_view A, bool transposeA,
-                        matrix_const_view B, bool transposeB, real_t beta,
-                        matrix_mutable_view C)
+void blas_matrix_matrix(real_t alpha, matrix_const_view A, matrix_const_view B,
+                        real_t beta, matrix_mutable_view C)
 {
-    size_t K = transposeA ? A.m() : A.n();
-    assert(transposeB ? B.n() : B.m() == K);
-    assert(transposeA ? A.n() : A.m() == C.m());
-    assert(transposeB ? B.m() : B.n() == C.n());
-
-    cblas_dgemm(CblasRowMajor, transposeA ? CblasTrans : CblasNoTrans,
-                transposeB ? CblasTrans : CblasNoTrans, C.m(), C.n(), K, alpha,
+    assert(A.n() == B.m());
+    assert(A.m() == C.m());
+    assert(B.n() == C.n());
+    bool transA = A.is_col_major() != C.is_col_major();
+    bool transB = B.is_col_major() != B.is_col_major();
+    cblas_dgemm(A.is_col_major() ? CblasColMajor : CblasRowMajor,
+                transA ? CblasTrans : CblasNoTrans,
+                transB ? CblasTrans : CblasNoTrans, C.m(), C.n(), A.n(), alpha,
                 &A(0, 0), A.ldim(), &B(0, 0), B.ldim(), beta, &C(0, 0),
                 C.ldim());
 }

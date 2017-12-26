@@ -6,16 +6,16 @@ src_dir:=${curr_dir}/src
 test_dir:=${curr_dir}/test
 example_dir:=${curr_dir}/example
 ifeq ($(release), 1)
-	flags:=-I${src_dir} -std=c++1z -Werror -MMD -O3 -DNDEBUG
+	flags:=-I${src_dir} -std=c++1z -Wreturn-type -Werror -MMD -O3 -DNDEBUG
 	link_flags:=-lstdc++ -lm -pthread -lblas -O3 -DNDEBUG
 	build_dir:=${curr_dir}/build/release
 else
   ifeq ($(profile), 1)
-	  flags:=-I${src_dir} -std=c++1z -Werror -MMD -g -O3 -pg -no-pie
+	  flags:=-I${src_dir} -std=c++1z -Wreturn-type -Werror -MMD -g -O3 -pg -no-pie
 	  link_flags:=-lstdc++ -lm -pthread -lblas -g -O3 -no-pie
 	  build_dir:=${curr_dir}/build/profile
   else
-	  flags:=-I${src_dir} -std=c++1z -Werror -MMD -g
+	  flags:=-I${src_dir} -std=c++1z -Wreturn-type -Werror -MMD -g
 	  link_flags:=-lstdc++ -lm -pthread -lblas -g
 	  build_dir:=${curr_dir}/build/debug
   endif

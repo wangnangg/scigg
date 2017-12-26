@@ -1,4 +1,5 @@
 #pragma once
+#include "blas.hpp"
 #include "matrix.hpp"
 #include "vector.hpp"
 
@@ -40,14 +41,16 @@ void set_norm2(vector_mutable_view vec, real_t val);
 void inc(vector_mutable_view y, vector_const_view x);
 // y = x - y
 void dec(vector_mutable_view y, vector_const_view x);
+// x' * y
+inline real_t dot(vector_const_view x, vector_const_view y)
+{
+    return blas_dot(x, y);
+}
 // y = A . x
-void dot(vector_mutable_view y, matrix_const_view A, bool transposeA,
-         vector_mutable_view x);
-vector dot(matrix_const_view A, bool transposeA, vector_mutable_view x);
+void dot(vector_mutable_view y, matrix_const_view A, vector_mutable_view x);
+vector dot(matrix_const_view A, vector_mutable_view x);
 
 // C = A . B
-void dot(matrix_mutable_view C, matrix_const_view A, bool transposeA,
-         matrix_const_view B, bool transposeB);
-matrix dot(matrix_const_view A, bool transposeA, matrix_const_view B,
-           bool transposeB);
+void dot(matrix_mutable_view C, matrix_const_view A, matrix_const_view B);
+matrix dot(matrix_const_view A, matrix_const_view B);
 }

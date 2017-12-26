@@ -38,9 +38,8 @@ void blas_scale(real_t alpha, vector_mutable_view v);
 
 // level 2 blas
 // y = alpha * A * x + beta * y
-void blas_matrix_vector(real_t alpha, matrix_const_view A, bool transposeA,
-                        vector_const_view x, real_t beta,
-                        vector_mutable_view y);
+void blas_matrix_vector(real_t alpha, matrix_const_view A, vector_const_view x,
+                        real_t beta, vector_mutable_view y);
 
 // A = alpha*x*y' +  A
 void blas_rank1(real_t alpha, vector_const_view x, vector_const_view y,
@@ -50,9 +49,8 @@ void blas_rank1(real_t alpha, vector_const_view x, vector_const_view y,
 
 // level 3 blas
 // C = alpha * A * B + beta * C
-void blas_matrix_matrix(real_t alpha, matrix_const_view A, bool transposeA,
-                        matrix_const_view B, bool transposeB, real_t beta,
-                        matrix_mutable_view C);
+void blas_matrix_matrix(real_t alpha, matrix_const_view A, matrix_const_view B,
+                        real_t beta, matrix_mutable_view C);
 
 // rank k or 2k op, omitted
 };

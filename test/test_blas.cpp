@@ -65,13 +65,15 @@ TEST(test_blas, level2)
     vector y = create_vector(4, {-1, -2, -3, -4});
     print(M);
     // y = 2.0 * M * x + 3.0 * y
-    blas_matrix_vector(2.0, M, false, x, 3.0, y);
+    blas_matrix_vector(2.0, M, x, 3.0, y);
     print(y);
     ASSERT_EQ(y, create_vector(4, {67, 214, 361, 508}));
 
     x = create_vector(5, {5, 4, 3, 2, 1});
     y = create_vector(4, {-1, -2, -3, -4});
-    blas_matrix_vector(2.0, M, true, y, 3.0, x);
+    auto Mt = M.transpose();
+    print(Mt);
+    blas_matrix_vector(2.0, Mt, y, 3.0, x);
     print(x);
     ASSERT_EQ(x, create_vector(5, {-205, -228, -251, -274, -297}));
 }
@@ -102,7 +104,8 @@ TEST(test_blas, level3)
                              });
 
     // C = alpha * A * B + beta * C
-    blas_matrix_matrix(2.0, A, false, B, false, 3.0, C);
+    blas_matrix_matrix(2.0, A, B, 3.0, C);
+    print(C);
     ASSERT_EQ(C, create_matrix(4, 3,
                                {
                                    233, -3, 233,     //

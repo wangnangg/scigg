@@ -21,7 +21,7 @@ TEST(test_linalg, qr_decomp_gms)
         print(A);
         print(Q);
         print(R);
-        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
+        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
     }
     {
         auto A = create_matrix(3, 3,
@@ -37,7 +37,7 @@ TEST(test_linalg, qr_decomp_gms)
         print(A);
         print(Q);
         print(R);
-        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
+        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
     }
     {
         auto A = create_matrix(4, 3,
@@ -54,7 +54,7 @@ TEST(test_linalg, qr_decomp_gms)
         print(A);
         print(Q);
         print(R);
-        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
+        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
     }
 }
 TEST(test_linalg, householder)
@@ -119,8 +119,8 @@ TEST(test_linalg, qr_decomp_hr)
         std::cout << "R ";
         print(R);
         std::cout << "Q.R ";
-        print(dot(Q, false, R, false));
-        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
+        print(dot(Q, R));
+        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
     }
     {
         auto A = create_matrix(3, 3,
@@ -145,8 +145,8 @@ TEST(test_linalg, qr_decomp_hr)
         std::cout << "R ";
         print(R);
         std::cout << "Q.R ";
-        print(dot(Q, false, R, false));
-        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
+        print(dot(Q, R));
+        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
     }
     {
         auto A = create_matrix(4, 3,
@@ -172,7 +172,7 @@ TEST(test_linalg, qr_decomp_hr)
         std::cout << "R ";
         print(R);
         std::cout << "Q.R ";
-        print(dot(Q, false, R, false));
-        ASSERT_TRUE(near_eq(A, dot(Q, false, R, false), 1e-8));
+        print(dot(Q, R));
+        ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
     }
 }

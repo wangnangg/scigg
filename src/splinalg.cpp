@@ -155,5 +155,6 @@ real_t linsv_gmres(const spmatrix& A, bool transposeA, vector_mutable_view x,
     assert(A.m() == A.n());
     size_t n = A.n();
     matrix H(m, n);
+    return 0;
 }
 }

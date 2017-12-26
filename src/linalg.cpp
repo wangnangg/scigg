@@ -65,7 +65,7 @@ void apply_householder_reflector(matrix_mutable_view A, real_t tau,
     real_t v0 = v[0];
     v[0] = 1;
     vector vt_A(A.n());
-    blas_matrix_vector(1.0, A, true, v, 0.0, vt_A);
+    blas_matrix_vector(1.0, A.transpose(), v, 0.0, vt_A);
     blas_rank1(-tau, v, vt_A, A);
     v[0] = v0;
 }
