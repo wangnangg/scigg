@@ -76,6 +76,36 @@ void set_diag(matrix_mutable_view A, real_t val)
     }
 }
 
+vector operator*(real_t alpha, vector_const_view x)
+{
+    vector y(x.dim(), 0.0);
+    blas_axpy(alpha, x, y);
+    return y;
+}
+
+void scale(matrix_mutable_view A, real_t alpha)
+{
+    for (size_t i = 0; i < A.m(); i++)
+    {
+        for (size_t j = 0; j < A.n(); j++)
+        {
+            A(i, j) *= alpha;
+        }
+    }
+}
+
+matrix operator*(real_t alpha, matrix_const_view A)
+{
+    matrix B(A.m(), A.n());
+    for (size_t i = 0; i < B.m(); i++)
+    {
+        for (size_t j = 0; j < B.n(); j++)
+        {
+            B(i, j) = A(i, j) * alpha;
+        }
+    }
+    return B;
+}
 void add(vector_mutable_view z, vector_const_view x, vector_const_view y)
 {
     assert(z.dim() == x.dim());

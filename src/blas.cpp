@@ -58,11 +58,6 @@ void blas_scale(real_t alpha, vector_mutable_view v)
     cblas_dscal(v.dim(), alpha, &v[0], v.inc());
 }
 
-void blas_scale(real_t alpha, matrix_mutable_view A)
-{
-    cblas_dscal(A.m() * A.n(), alpha, &A(0, 0), 1);
-}
-
 // level 2 blas
 
 // y = alpha * A * x + beta * y

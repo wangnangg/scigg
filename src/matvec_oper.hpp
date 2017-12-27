@@ -35,8 +35,24 @@ void fill(matrix_mutable_view A, real_t val);
 void set_diag(matrix_mutable_view A, real_t val);
 
 inline void scale(vector_mutable_view x, real_t alpha) { blas_scale(alpha, x); }
+inline vector_mutable_view operator*=(vector_mutable_view x, real_t alpha)
+{
+    scale(x, alpha);
+    return x;
+}
 
-inline void scale(matrix_mutable_view A, real_t alpha) { blas_scale(alpha, A); }
+vector operator*(real_t alpha, vector_const_view x);
+inline vector operator*(vector_const_view x, real_t alpha) { return alpha * x; }
+
+void scale(matrix_mutable_view A, real_t alpha);
+inline matrix_mutable_view operator*=(matrix_mutable_view A, real_t alpha)
+{
+    scale(A, alpha);
+    return A;
+}
+
+matrix operator*(real_t alpha, matrix_const_view A);
+inline matrix operator*(matrix_const_view A, real_t alpha) { return alpha * A; }
 
 inline real_t norm1(vector_const_view vec) { return blas_abs_sum(vec); }
 
