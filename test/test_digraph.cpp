@@ -32,6 +32,6 @@ TEST(test_digraph, strongly_connected_components)
     crtor.add_entry(7, 6, 1);
     crtor.add_entry(8, 9, 1);
     crtor.add_entry(9, 8, 1);
-    const auto scc_list = strongly_connected(crtor.create(CPR_ROW));
+    const auto scc_list = strongly_connected(crtor.create(true));
     ASSERT_EQ(bottom_count(scc_list), 3);
 }

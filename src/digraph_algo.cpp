@@ -9,7 +9,7 @@ struct scc_node
     scc_node() : depth(0), lowlink(0), onstack(false) {}
 };
 
-bool recursive_visit(const spmatrix& mat, std::vector<scc_node>& node_info,
+bool recursive_visit(spmatrix_const_view mat, std::vector<scc_node>& node_info,
                      size_t src_idx, size_t& depth,
                      std::vector<size_t>& node_stack,
                      std::vector<scc_component>& scc_list)
@@ -73,7 +73,7 @@ bool recursive_visit(const spmatrix& mat, std::vector<scc_node>& node_info,
     }
 }
 
-std::vector<scc_component> strongly_connected(const spmatrix& digraph)
+std::vector<scc_component> strongly_connected(spmatrix_const_view digraph)
 {
     assert(digraph.m() == digraph.n());
     std::vector<scc_component> scc_list;

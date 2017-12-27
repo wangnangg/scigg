@@ -23,9 +23,8 @@ real_t max_diff(vector_const_view v1, vector_const_view v2)
     return max;
 }
 
-real_t eigen_power_method(const spmatrix& A, bool transposeA,
-                          vector_mutable_view x, real_t tol, int_t max_iter,
-                          int_t check_interval)
+real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
+                          real_t tol, int_t max_iter, int_t check_interval)
 {
     set_norm1(x, 1.0);
     vector x_next_(x.dim(), 0.0);
@@ -34,7 +33,7 @@ real_t eigen_power_method(const spmatrix& A, bool transposeA,
     {
         for (int_t jj = 0; jj < check_interval; jj++)
         {
-            dot(x_next, A, transposeA, x);
+            dot(x_next, A, x);
             set_norm1(x_next, 1.0);
             std::swap(x_next, x);
         }
@@ -47,15 +46,14 @@ real_t eigen_power_method(const spmatrix& A, bool transposeA,
     return max_diff(x_next, x);
 }
 
-real_t linsv_sor_method(const spmatrix& A, bool transposeA,
-                        vector_mutable_view x, vector_const_view b, real_t w,
-                        real_t tol, int_t max_iter, int_t check_interval)
+real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
+                        vector_const_view b, real_t w, real_t tol,
+                        int_t max_iter, int_t check_interval)
 {
     assert(A.m() == A.n());
     assert(A.m() == x.dim());
     assert(A.m() == b.dim());
-    assert((!transposeA && A.format() == CPR_ROW) ||
-           (transposeA && A.format() == CPR_COL));
+    assert(A.is_compressed_row());
     vector x_next_(x.dim(), 0.0);
     vector_mutable_view x_next = x_next_;
     for (int_t ii = 0; ii < max_iter / check_interval; ii++)
@@ -94,16 +92,14 @@ real_t linsv_sor_method(const spmatrix& A, bool transposeA,
     return max_diff(x_next, x);
 }
 
-real_t linsv_sor_method(const spmatrix& A, bool transposeA,
-                        vector_mutable_view x, vector_const_view b,
-                        real_t x_sum, real_t w, real_t tol, int_t max_iter,
-                        int_t check_interval)
+real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
+                        vector_const_view b, real_t x_sum, real_t w, real_t tol,
+                        int_t max_iter, int_t check_interval)
 {
     assert(A.m() == A.n());
     assert(A.m() == x.dim());
     assert(A.m() == b.dim());
-    assert((!transposeA && A.format() == CPR_ROW) ||
-           (transposeA && A.format() == CPR_COL));
+    assert(A.is_compressed_row());
     vector x_next_(x.dim(), 0.0);
     vector_mutable_view x_next = x_next_;
     size_t last_vec = A.ldim() - 1;
@@ -147,7 +143,7 @@ real_t linsv_sor_method(const spmatrix& A, bool transposeA,
 }
 
 // solve Ax = b, A must be full rank.
-real_t linsv_gmres(const spmatrix& A, bool transposeA, vector_mutable_view x,
+real_t linsv_gmres(spmatrix_const_view A, vector_mutable_view x,
                    vector_const_view b,
                    size_t m,  // dim of krylov space
                    real_t tol)

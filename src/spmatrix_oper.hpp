@@ -6,11 +6,10 @@
 namespace markovgg
 {
 spmatrix create_spmatrix(size_t m, size_t n, const std::vector<double>& v,
-                         spmatrix_format format);
+                         bool is_row_compressed);
 
 // y = A . x
-void dot(vector_mutable_view y, const spmatrix& A, bool tranposeA,
-         vector_const_view x);
+void dot(vector_mutable_view y, spmatrix_const_view A, vector_const_view x);
 
-vector dot(const spmatrix& A, bool transposeA, vector_const_view x);
+vector dot(spmatrix_const_view A, vector_const_view x);
 }

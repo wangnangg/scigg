@@ -11,5 +11,5 @@ struct scc_component
 };
 
 // digraph must be in from_to format.
-std::vector<scc_component> strongly_connected(const spmatrix& digraph);
+std::vector<scc_component> strongly_connected(spmatrix_const_view digraph);
 }
