@@ -55,6 +55,20 @@ void fill(vector_mutable_view x, real_t val)
     }
 }
 
+void copy(vector_mutable_view y, vector_const_view x) { blas_copy(x, y); }
+void copy(matrix_mutable_view Y, matrix_const_view X)
+{
+    assert(Y.m() == X.m());
+    assert(Y.n() == X.n());
+    for (size_t i = 0; i < Y.m(); i++)
+    {
+        for (size_t j = 0; j < Y.n(); j++)
+        {
+            Y(i, j) = X(i, j);
+        }
+    }
+}
+
 void fill(matrix_mutable_view A, real_t val)
 {
     for (size_t i = 0; i < A.m(); i++)

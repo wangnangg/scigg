@@ -1,6 +1,7 @@
 #include "splinalg.hpp"
 #include <cassert>
 #include "blas.hpp"
+#include "linalg.hpp"
 #include "matvec_oper.hpp"
 #include "spblas.hpp"
 #include "spmatrix_oper.hpp"
@@ -21,6 +22,11 @@ real_t max_diff(vector_const_view v1, vector_const_view v2)
         }
     }
     return max;
+}
+real_t abs_max_val(vector_const_view v)
+{
+    size_t idx = blas_abs_max_idx(v);
+    return abs(v[idx]);
 }
 
 real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
@@ -79,6 +85,7 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
                         diag = e.val;
                     }
                 }
+                assert(diag != 0);
                 x_next[i] = (1 - w) * x[i] + w / diag * remain;
             }
             std::swap(x_next, x);
@@ -142,15 +149,91 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
     return max_diff(x_next, x);
 }
 
+void compute_xm(vector_mutable_view xm, vector_const_view x0,
+                const std::vector<vector>& Vm, vector_const_view ym)
+{
+    assert(xm.dim() == x0.dim());
+    assert(xm.dim() == Vm[0].dim());
+    assert(Vm.size() == ym.dim());
+    copy(xm, x0);
+    for (size_t i = 0; i < ym.dim(); i++)
+    {
+        blas_axpy(ym[i], Vm[i], xm);
+    }
+}
+
 // solve Ax = b, A must be full rank.
-real_t linsv_gmres(spmatrix_const_view A, vector_mutable_view x,
-                   vector_const_view b,
-                   size_t m,  // dim of krylov space
-                   real_t tol)
+real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
+                       vector_const_view b,
+                       size_t kdim,  // dim of krylov space
+                       real_t tol)
 {
     assert(A.m() == A.n());
-    size_t n = A.n();
-    matrix H(m, n);
-    return 0;
+    if (kdim > A.n())
+    {
+        kdim = A.n();
+    }
+    size_t M = A.m();
+    std::vector<vector> V;
+    V.reserve(kdim);
+    matrix H(kdim + 1, kdim);
+    // step 1a: V.col(0) = b - A * x
+    V.push_back(vector(b));
+    spblas_matrix_vector(-1.0, A, x, 1.0, V[0]);
+
+    real_t beta = norm2(V[0]);
+    scale(V[0], 1.0 / beta);
+    vector wj(M);
+    vector y(kdim + 1, 0.0);
+    vector xm(x.dim());
+    vector res(x.dim());
+    real_t prec = 0;
+    for (size_t j = 0; j < kdim; j++)
+    {
+        dot(wj, A, V[j]);
+        for (size_t i = 0; i <= j; i++)
+        {
+            H(i, j) = dot(wj, V[i]);
+            // wj = wj - H(i, j) * v_i
+            blas_axpy(-H(i, j), V[i], wj);
+        }
+        H(j + 1, j) = norm2(wj);
+        size_t m = j + 1;
+        vector_mutable_view ym = y.sub(0, m + 1);
+        fill(ym, 0);
+        ym[0] = beta;
+        auto Hm = matrix(H.sub(0, 0, m + 1, m));
+        least_square_qr(Hm, ym);
+        compute_xm(xm, x, V, ym.sub(0, m));
+        copy(res, b);
+        spblas_matrix_vector(-1.0, A, xm, 1.0, res);
+        prec = abs_max_val(res);
+        if (prec < tol || near_zero(H(j + 1, j), tol))
+        {
+            break;
+        }
+        scale(wj, 1.0 / H(j + 1, j));
+        V.push_back(wj);
+    }
+    copy(x, xm);
+    return prec;
+}
+
+real_t linsv_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
+                               vector_const_view b,
+                               size_t kdim,  // dim of krylov space
+                               real_t tol, int_t max_iter)
+{
+    vector res_v(b.dim());
+    real_t prec = 0;
+    for (int_t ii = 0; ii < max_iter; ii++)
+    {
+        prec = linsv_gmres_gms(A, x, b, kdim, tol);
+        if (prec < tol)
+        {
+            return prec;
+        }
+    }
+    return prec;
 }
 }

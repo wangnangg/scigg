@@ -42,6 +42,34 @@ class matrix;
 class matrix_mutable_view;
 class matrix_const_view;
 
+class matrix_const_view : public matrix_base
+{
+protected:
+    const real_t* _const_data;
+
+public:
+    matrix_const_view(const real_t* data, size_t m, size_t n, size_t ldim,
+                      bool col_major)
+        : matrix_base(m, n, ldim, col_major), _const_data(data)
+    {
+    }
+    matrix_const_view(const matrix_mutable_view& M);
+    matrix_const_view(const matrix& M);
+    const real_t& operator()(size_t i, size_t j) const
+    {
+        assert(i < m() && j < n());
+        return _const_data[i * _row_step + j * _col_step];
+    }
+    vector_const_view row(size_t row_idx) const;
+    vector_const_view col(size_t col_idx) const;
+    matrix_const_view sub(size_t start_row, size_t start_col,
+                          size_t end_row = 0, size_t end_col = 0) const;
+    matrix_const_view transpose() const
+    {
+        return matrix_const_view(_const_data, n(), m(), ldim(), !_col_major);
+    }
+};
+
 class matrix_mutable_view : public matrix_base
 {
     real_t* _mutable_data;
@@ -69,34 +97,6 @@ public:
     }
 };
 
-class matrix_const_view : public matrix_base
-{
-protected:
-    const real_t* _const_data;
-
-public:
-    matrix_const_view(const real_t* data, size_t m, size_t n, size_t ldim,
-                      bool col_major)
-        : matrix_base(m, n, ldim, col_major), _const_data(data)
-    {
-    }
-    matrix_const_view(matrix_mutable_view M);
-    matrix_const_view(const matrix& M);
-    const real_t& operator()(size_t i, size_t j) const
-    {
-        assert(i < m() && j < n());
-        return _const_data[i * _row_step + j * _col_step];
-    }
-    vector_const_view row(size_t row_idx) const;
-    vector_const_view col(size_t col_idx) const;
-    matrix_const_view sub(size_t start_row, size_t start_col,
-                          size_t end_row = 0, size_t end_col = 0) const;
-    matrix_const_view transpose() const
-    {
-        return matrix_const_view(_const_data, n(), m(), ldim(), !_col_major);
-    }
-};
-
 class matrix : public matrix_base
 {
     std::vector<real_t> _data;  // row major
@@ -105,6 +105,7 @@ public:
         : matrix_base(m, n, col_major ? m : n, col_major), _data(m * n, val)
     {
     }
+    explicit matrix(matrix_const_view mat);
     const real_t& operator()(size_t i, size_t j) const
     {
         assert(i < m() && j < n());

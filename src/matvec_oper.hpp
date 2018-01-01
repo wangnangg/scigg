@@ -32,6 +32,10 @@ bool near_eq(matrix_const_view M1, matrix_const_view M2, real_t tol);
 void fill(vector_mutable_view x, real_t val);
 void fill(matrix_mutable_view A, real_t val);
 
+// y = x
+void copy(vector_mutable_view y, vector_const_view x);
+void copy(matrix_mutable_view Y, matrix_const_view X);
+
 void set_diag(matrix_mutable_view A, real_t val);
 
 inline void scale(vector_mutable_view x, real_t alpha) { blas_scale(alpha, x); }

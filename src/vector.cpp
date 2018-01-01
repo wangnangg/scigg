@@ -1,5 +1,5 @@
 #include "vector.hpp"
-
+#include "blas.hpp"
 namespace markovgg
 {
 vector_mutable_view::vector_mutable_view(vector &v)
@@ -12,9 +12,14 @@ vector_const_view::vector_const_view(const vector &v)
 {
 }
 
-vector_const_view::vector_const_view(vector_mutable_view v)
+vector_const_view::vector_const_view(const vector_mutable_view &v)
     : vector_const_view(&v[0], v.dim(), v.inc())
 {
+}
+
+vector::vector(vector_const_view x) : vector_base(1, x.dim()), _data(x.dim())
+{
+    blas_copy(x, *this);
 }
 
 bool operator==(vector_const_view x, vector_const_view y)

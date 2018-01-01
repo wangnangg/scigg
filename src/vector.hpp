@@ -6,10 +6,9 @@ namespace markovgg
 {
 class vector_base
 {
+protected:
     size_t _inc;
     size_t _dim;
-
-protected:
     vector_base(size_t inc, size_t dim) : _inc(inc), _dim(dim) {}
 
 public:
@@ -20,6 +19,34 @@ public:
 class vector;
 class vector_mutable_view;
 class vector_const_view;
+
+class vector_const_view : public vector_base
+{
+protected:
+    const real_t *_const_data;
+
+public:
+    vector_const_view(const real_t *const_data, size_t dim, size_t inc)
+        : vector_base(inc, dim), _const_data(const_data)
+    {
+    }
+    vector_const_view(const vector &v);
+    vector_const_view(const vector_mutable_view &v);
+    const real_t &operator[](size_t i) const
+    {
+        assert(i < dim());
+        return _const_data[i * inc()];
+    }
+    vector_const_view sub(size_t start, size_t end = 0) const
+    {
+        assert(end <= dim());
+        if (end == 0)
+        {
+            end = dim();
+        }
+        return vector_const_view(&operator[](start), end - start, inc());
+    }
+};
 
 class vector_mutable_view : public vector_base
 {
@@ -48,33 +75,6 @@ public:
     }
 };
 
-class vector_const_view : public vector_base
-{
-protected:
-    const real_t *_const_data;
-
-public:
-    vector_const_view(const real_t *const_data, size_t dim, size_t inc)
-        : vector_base(inc, dim), _const_data(const_data)
-    {
-    }
-    vector_const_view(const vector &v);
-    vector_const_view(vector_mutable_view v);
-    const real_t &operator[](size_t i) const
-    {
-        assert(i < dim());
-        return _const_data[i * inc()];
-    }
-    vector_const_view sub(size_t start, size_t end = 0) const
-    {
-        assert(end <= dim());
-        if (end == 0)
-        {
-            end = dim();
-        }
-        return vector_const_view(&operator[](start), end - start, inc());
-    }
-};
 class vector : public vector_base
 {
     std::vector<real_t> _data;
@@ -83,6 +83,7 @@ public:
     vector(size_t dim, real_t val = 0.0) : vector_base(1, dim), _data(dim, val)
     {
     }
+    explicit vector(vector_const_view x);
     const real_t &operator[](size_t i) const
     {
         assert(i < dim());

@@ -32,4 +32,14 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
 real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
                         vector_const_view b, real_t x_sum, real_t w, real_t tol,
                         int_t max_iter, int_t check_interval);
+
+real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
+                       vector_const_view b,
+                       size_t kdim,  // dim of krylov space
+                       real_t tol);
+
+real_t linsv_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
+                               vector_const_view b,
+                               size_t kdim,  // dim of krylov space
+                               real_t tol, int_t max_iter);
 }

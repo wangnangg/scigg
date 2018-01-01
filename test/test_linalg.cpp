@@ -176,3 +176,91 @@ TEST(test_linalg, qr_decomp_hr)
         ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
     }
 }
+
+TEST(test_linalg, qr_compact_oper)
+{
+    auto A = create_matrix(4, 3,
+                           {
+
+                               12, -51, 4,   //
+                               6, 167, -68,  //
+                               -4, 24, -41,  //
+                               -2, 5, 8      //
+                           });
+    const auto v = create_vector(4, {1, 2, 3, 4});
+    auto QR = A;
+    vector tau(A.n());
+    qr_decomp_hr(QR, tau);
+    matrix Q(A.m(), A.n());
+    matrix R(A.n(), A.n());
+    unpack_qr(QR, tau, Q, R);
+    auto Qtv = v;
+    qt_dot_vector(QR, tau, Qtv);
+    std::cout << "compact ";
+    print(Qtv.sub(0, 3));
+    std::cout << "direct ";
+    print(dot(Q.transpose(), v));
+    ASSERT_TRUE(near_eq(Qtv.sub(0, 3), dot(Q.transpose(), v), 1e-6));
+
+    const auto w = create_vector(4, {1, 2, 3, 0});
+    auto Qw = w;
+    q_dot_vector(QR, tau, Qw);
+    std::cout << "compact ";
+    print(Qw);
+    std::cout << "direct ";
+    print(dot(Q, w.sub(0, 3)));
+    ASSERT_TRUE(near_eq(Qw, dot(Q, w.sub(0, 3)), 1e-6));
+}
+
+TEST(test_linalg, solve_triangular)
+{
+    {
+        auto U = create_matrix(4, 4,
+                               {
+                                   1, 2, 0, 4,  //
+                                   0, 6, 8, 0,  //
+                                   0, 0, 2, 3,  //
+                                   0, 0, 0, 5   //
+                               });
+        const vector b = create_vector(4, {1, 2, 3, 4});
+        vector x = b;
+        solve_upper_tri(U, x);
+        print(x);
+        ASSERT_TRUE(near_eq(dot(U, x), b, 1e-6));
+    }
+    {
+        auto U = create_matrix(4, 4,
+                               {
+                                   1, 2, 0, 4,  //
+                                   0, 6, 8, 0,  //
+                                   0, 0, 2, 3,  //
+                                   0, 0, 0, 5   //
+                               });
+        auto L = U.transpose();
+        const vector b = create_vector(4, {1, 2, 3, 4});
+        vector x = b;
+        solve_lower_tri(L, x);
+        print(x);
+        ASSERT_TRUE(near_eq(dot(L, x), b, 1e-6));
+    }
+}
+
+TEST(test_linalg, least_square)
+{
+    const auto A = create_matrix(4, 3,
+                                 {
+
+                                     12, -51, 4,   //
+                                     6, 167, -68,  //
+                                     -4, 24, -41,  //
+                                     -2, 5, 8      //
+                                 });
+    const auto b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    matrix QR = A;
+    least_square_qr(QR, x);
+    print(x.sub(0, A.n()));
+    ASSERT_TRUE(near_eq(x.sub(0, A.n()),
+                        create_vector(3, {-0.0243225, -0.00982752, -0.0549788}),
+                        1e-6));
+}

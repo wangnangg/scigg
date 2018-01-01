@@ -11,9 +11,23 @@ matrix_const_view::matrix_const_view(const matrix& M)
     : matrix_const_view(&M(0, 0), M.m(), M.n(), M.ldim(), M.is_col_major())
 {
 }
-matrix_const_view::matrix_const_view(matrix_mutable_view M)
+matrix_const_view::matrix_const_view(const matrix_mutable_view& M)
     : matrix_const_view(&M(0, 0), M.m(), M.n(), M.ldim(), M.is_col_major())
 {
+}
+
+matrix::matrix(matrix_const_view mat)
+    : matrix_base(mat.m(), mat.n(), mat.is_col_major() ? mat.m() : mat.n(),
+                  mat.is_col_major()),
+      _data(mat.m() * mat.n())
+{
+    for (size_t i = 0; i < mat.m(); i++)
+    {
+        for (size_t j = 0; j < mat.n(); j++)
+        {
+            this->operator()(i, j) = mat(i, j);
+        }
+    }
 }
 
 vector_mutable_view matrix_mutable_view::row(size_t row_idx) const

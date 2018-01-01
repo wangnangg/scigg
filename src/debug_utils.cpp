@@ -32,7 +32,7 @@ std::ostream& operator<<(std::ostream& os, const matrix_mutable_view& mat)
 
 std::ostream& operator<<(std::ostream& os, const vector_const_view& v)
 {
-    if (v.dim() > 100)
+    if (v.dim() > 10000)
     {
         return os << "vector (" << v.dim() << ")";
     }
@@ -44,7 +44,16 @@ std::ostream& operator<<(std::ostream& os, const vector_const_view& v)
     return os << "]";
 }
 
-std::ostream& operator<<(std::ostream& os, const spmatrix& mat)
+std::ostream& operator<<(std::ostream& os, const vector& v)
+{
+    return os << vector_const_view(v);
+}
+std::ostream& operator<<(std::ostream& os, const vector_mutable_view& v)
+{
+    return os << vector_const_view(v);
+}
+
+std::ostream& operator<<(std::ostream& os, const spmatrix_const_view& mat)
 {
     if (mat.m() > 100 && mat.n() > 100)
     {
@@ -60,6 +69,15 @@ std::ostream& operator<<(std::ostream& os, const spmatrix& mat)
         os << std::endl;
     }
     return os;
+}
+std::ostream& operator<<(std::ostream& os, const spmatrix& mat)
+{
+    return os << spmatrix_const_view(mat);
+}
+
+std::ostream& operator<<(std::ostream& os, const spmatrix_mutable_view& mat)
+{
+    return os << spmatrix_const_view(mat);
 }
 
 std::ostream& operator<<(std::ostream& os, const spmat_cs_entry& e)

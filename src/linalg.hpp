@@ -13,12 +13,12 @@ real_t find_householder_vector(vector_mutable_view w);
 // w = w - \tau vv'w, v[0] is ignored and v[0] = 1 is assumed. v will only be
 // changed temporarily.
 void apply_householder_reflector(vector_mutable_view w, real_t tau,
-                                 vector_mutable_view v);
+                                 vector_const_view v);
 
 // A = A - \tau vv'A, v[0] is ignored and v[0] = 1 is assumed. v will only be
 // changed temporarily.
 void apply_householder_reflector(matrix_mutable_view A, real_t tau,
-                                 vector_mutable_view v);
+                                 vector_const_view v);
 
 // QR decomposition using householder reflection
 // the upper triangular of A will be replaced by R
@@ -28,9 +28,23 @@ void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec);
 
 // unpack Q, R from QR and tau, where the strict lower part of V are reflection
 // vectors from QR decomposition using householder reflection
-void unpack_qr(matrix_mutable_view QR, vector_const_view tau_vec,
+void unpack_qr(matrix_const_view QR, vector_const_view tau_vec,
                matrix_mutable_view Q, matrix_mutable_view R);
+
+void qt_dot_vector(matrix_const_view QR, vector_const_view tau,
+                   vector_mutable_view v);
+void q_dot_vector(matrix_const_view QR, vector_const_view tau,
+                  vector_mutable_view v);
 
 // QR decomposition using Givens Rotation
 void qr_decomp_gr();
+
+// solve L x = b, b will be replaced with solution
+void solve_lower_tri(matrix_const_view L, vector_mutable_view b);
+
+// solve U x = b, b will be replaced with solution
+void solve_upper_tri(matrix_const_view U, vector_mutable_view b);
+
+// solve min||b - A x|| using QR decomposition, b will be replaced with solution
+void least_square_qr(matrix_mutable_view A, vector_mutable_view b);
 }

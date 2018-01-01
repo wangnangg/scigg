@@ -4,7 +4,7 @@
 #include "debug_utils.hpp"
 #include "gtest/gtest.h"
 #include "matrix.hpp"
-
+#include "matvec_oper.hpp"
 TEST(test_matrix, submatrix)
 {
     {
@@ -51,5 +51,16 @@ TEST(test_matrix, submatrix)
                                           2, 9,  //
                                           2, 9,  //
                                       }));
+    }
+    {
+        matrix A_ = create_matrix(4, 3,
+                                  {
+                                      1, 2, 3,  //
+                                      2, 2, 1,  //
+                                      7, 2, 9,  //
+                                      7, 2, 9,  //
+                                  });
+        copy(A_.col(2).sub(2), create_vector(2, {8, 8}));
+        ASSERT_EQ(A_.col(2), create_vector(4, {3, 1, 8, 8}));
     }
 }

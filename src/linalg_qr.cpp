@@ -1,7 +1,7 @@
-#include "linalg.hpp"
 #include <cassert>
 #include "blas.hpp"
 #include "debug_utils.hpp"
+#include "linalg.hpp"
 #include "matvec_oper.hpp"
 
 namespace markovgg
@@ -48,25 +48,27 @@ real_t find_householder_vector(vector_mutable_view w)
 // w = w - \tau vv'w, v[0] is ignored and v[0] = 1 is assumed. v will only be
 // changed temporarily.
 void apply_householder_reflector(vector_mutable_view w, real_t tau,
-                                 vector_mutable_view v)
+                                 vector_const_view v)
 {
-    real_t v0 = v[0];
-    v[0] = 1;
-    real_t val = dot(v, w);
-    blas_axpy(-tau * val, v, w);
-    v[0] = v0;
+    auto vm = vector_mutable_view(const_cast<real_t*>(&v[0]), v.dim(), v.inc());
+    real_t v0 = vm[0];
+    vm[0] = 1;
+    real_t val = dot(vm, w);
+    blas_axpy(-tau * val, vm, w);
+    vm[0] = v0;
 }
 
 // A = A - \tau vv'A, v[0] is ignored and v[0] = 1 is assumed. v will only be
 // changed temporarily.
 void apply_householder_reflector(matrix_mutable_view A, real_t tau,
-                                 vector_mutable_view v)
+                                 vector_const_view v)
 {
-    real_t v0 = v[0];
-    v[0] = 1;
-    auto vt_A = v * A;
-    blas_rank1(-tau, v, vt_A, A);
-    v[0] = v0;
+    auto vm = vector_mutable_view(const_cast<real_t*>(&v[0]), v.dim(), v.inc());
+    real_t v0 = vm[0];
+    vm[0] = 1;
+    auto vt_A = vm * A;
+    blas_rank1(-tau, vm, vt_A, A);
+    vm[0] = v0;
 }
 
 void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec)
@@ -86,7 +88,8 @@ void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec)
         tau_vec[k] = tau;
     }
 }
-void unpack_qr(matrix_mutable_view QR, vector_const_view tau_vec,
+
+void unpack_qr(matrix_const_view QR, vector_const_view tau_vec,
                matrix_mutable_view Q, matrix_mutable_view R)
 {
     assert(QR.m() == Q.m());
@@ -114,6 +117,33 @@ void unpack_qr(matrix_mutable_view QR, vector_const_view tau_vec,
         {
             R(i, j) = QR(i, j);
         }
+    }
+}
+
+// compute v = Q^T * v
+void qt_dot_vector(matrix_const_view QR, vector_const_view tau,
+                   vector_mutable_view v)
+{
+    assert(QR.m() >= QR.n());
+    assert(QR.n() == tau.dim());
+    assert(QR.m() == v.dim());
+    for (size_t i = 0; i < QR.n(); i++)
+    {
+        apply_householder_reflector(v.sub(i), tau[i], QR.col(i).sub(i));
+    }
+}
+
+// compute v = Q * v
+void q_dot_vector(matrix_const_view QR, vector_const_view tau,
+                  vector_mutable_view v)
+{
+    assert(QR.m() >= QR.n());
+    assert(QR.n() == tau.dim());
+    assert(QR.m() == v.dim());
+    for (size_t i = 0; i < QR.n(); i++)
+    {
+        size_t k = QR.n() - i - 1;
+        apply_householder_reflector(v.sub(k), tau[k], QR.col(k).sub(k));
     }
 }
 }
