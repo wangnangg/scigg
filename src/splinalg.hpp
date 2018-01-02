@@ -14,7 +14,7 @@ namespace markovgg
  * reached precision is returned.
  */
 real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
-                          real_t tol, int_t max_iter, int_t check_interval);
+                          real_t tol, uint_t max_iter, uint_t check_interval);
 
 /** Solve A * x = b using sor method. A must be non-singular.
  * x is the initial guess and can be 0.
@@ -22,7 +22,7 @@ real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
  */
 real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
                         vector_const_view b, real_t w, real_t tol,
-                        int_t max_iter, int_t check_interval);
+                        uint_t max_iter, uint_t check_interval);
 
 /** Solve x * A = b using sor method. A must be of rank n - 1.
  * x is the initial guess and can be 0.
@@ -31,15 +31,16 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
  */
 real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
                         vector_const_view b, real_t x_sum, real_t w, real_t tol,
-                        int_t max_iter, int_t check_interval);
+                        uint_t max_iter, uint_t check_interval);
 
 real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
                        vector_const_view b,
                        size_t kdim,  // dim of krylov space
-                       real_t tol);
+                       real_t tol, uint_t check_interval);
 
 real_t linsv_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
                                vector_const_view b,
                                size_t kdim,  // dim of krylov space
-                               real_t tol, int_t max_iter);
+                               real_t tol, uint_t max_iter,
+                               uint_t check_interval);
 }

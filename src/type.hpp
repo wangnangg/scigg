@@ -7,6 +7,7 @@ namespace markovgg
 using std::size_t;
 typedef double real_t;
 typedef int int_t;
+typedef unsigned int uint_t;
 class msg_exception : public std::exception
 {
 public:

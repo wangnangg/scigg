@@ -30,14 +30,14 @@ real_t abs_max_val(vector_const_view v)
 }
 
 real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
-                          real_t tol, int_t max_iter, int_t check_interval)
+                          real_t tol, uint_t max_iter, uint_t check_interval)
 {
     set_norm1(x, 1.0);
     vector x_next_(x.dim(), 0.0);
     vector_mutable_view x_next(x_next_);
-    for (int_t ii = 0; ii < max_iter / check_interval; ii++)
+    for (uint_t ii = 0; ii < max_iter / check_interval; ii++)
     {
-        for (int_t jj = 0; jj < check_interval; jj++)
+        for (uint_t jj = 0; jj < check_interval; jj++)
         {
             dot(x_next, A, x);
             set_norm1(x_next, 1.0);
@@ -54,7 +54,7 @@ real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
 
 real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
                         vector_const_view b, real_t w, real_t tol,
-                        int_t max_iter, int_t check_interval)
+                        uint_t max_iter, uint_t check_interval)
 {
     assert(A.m() == A.n());
     assert(A.m() == x.dim());
@@ -62,9 +62,9 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
     assert(A.is_compressed_row());
     vector x_next_(x.dim(), 0.0);
     vector_mutable_view x_next = x_next_;
-    for (int_t ii = 0; ii < max_iter / check_interval; ii++)
+    for (uint_t ii = 0; ii < max_iter / check_interval; ii++)
     {
-        for (int_t jj = 0; jj < check_interval; jj++)
+        for (uint_t jj = 0; jj < check_interval; jj++)
         {
             for (size_t i = 0; i < A.ldim(); i++)
             {
@@ -101,7 +101,7 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
 
 real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
                         vector_const_view b, real_t x_sum, real_t w, real_t tol,
-                        int_t max_iter, int_t check_interval)
+                        uint_t max_iter, uint_t check_interval)
 {
     assert(A.m() == A.n());
     assert(A.m() == x.dim());
@@ -110,9 +110,9 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
     vector x_next_(x.dim(), 0.0);
     vector_mutable_view x_next = x_next_;
     size_t last_vec = A.ldim() - 1;
-    for (int_t ii = 0; ii < max_iter / check_interval; ii++)
+    for (uint_t ii = 0; ii < max_iter / check_interval; ii++)
     {
-        for (int_t jj = 0; jj < check_interval; jj++)
+        for (uint_t jj = 0; jj < check_interval; jj++)
         {
             real_t last_remain = x_sum;
             for (size_t i = 0; i < last_vec; i++)
@@ -166,7 +166,7 @@ void compute_xm(vector_mutable_view xm, vector_const_view x0,
 real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
                        vector_const_view b,
                        size_t kdim,  // dim of krylov space
-                       real_t tol)
+                       real_t tol, uint_t check_interval)
 {
     assert(A.m() == A.n());
     if (kdim > A.n())
@@ -188,6 +188,7 @@ real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
     vector xm(x.dim());
     vector res(x.dim());
     real_t prec = 0;
+    uint_t check_counter = 0;
     for (size_t j = 0; j < kdim; j++)
     {
         dot(wj, A, V[j]);
@@ -198,22 +199,31 @@ real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
             blas_axpy(-H(i, j), V[i], wj);
         }
         H(j + 1, j) = norm2(wj);
-        size_t m = j + 1;
-        vector_mutable_view ym = y.sub(0, m + 1);
-        fill(ym, 0);
-        ym[0] = beta;
-        auto Hm = matrix(H.sub(0, 0, m + 1, m));
-        least_square_qr(Hm, ym);
-        compute_xm(xm, x, V, ym.sub(0, m));
-        copy(res, b);
-        spblas_matrix_vector(-1.0, A, xm, 1.0, res);
-        prec = abs_max_val(res);
-        if (prec < tol || near_zero(H(j + 1, j), tol))
+
+        check_counter += 1;
+        if ((check_counter % check_interval == 0) || (j == kdim - 1))
         {
-            break;
+            check_counter = 0;
+            size_t m = j + 1;
+            vector_mutable_view ym = y.sub(0, m + 1);
+            fill(ym, 0);
+            ym[0] = beta;
+            auto Hm = matrix(H.sub(0, 0, m + 1, m));
+            least_square_qr(Hm, ym);
+            compute_xm(xm, x, V, ym.sub(0, m));
+            copy(res, b);
+            spblas_matrix_vector(-1.0, A, xm, 1.0, res);
+            prec = abs_max_val(res);
+            if (prec < tol || near_zero(H(j + 1, j), tol))
+            {
+                break;
+            }
         }
-        scale(wj, 1.0 / H(j + 1, j));
-        V.push_back(wj);
+        if (j < kdim - 1)
+        {
+            scale(wj, 1.0 / H(j + 1, j));
+            V.push_back(wj);
+        }
     }
     copy(x, xm);
     return prec;
@@ -222,13 +232,13 @@ real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
 real_t linsv_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
                                vector_const_view b,
                                size_t kdim,  // dim of krylov space
-                               real_t tol, int_t max_iter)
+                               real_t tol, uint_t max_iter,
+                               uint_t check_interval)
 {
-    vector res_v(b.dim());
     real_t prec = 0;
-    for (int_t ii = 0; ii < max_iter; ii++)
+    for (uint_t ii = 0; ii < max_iter; ii++)
     {
-        prec = linsv_gmres_gms(A, x, b, kdim, tol);
+        prec = linsv_gmres_gms(A, x, b, kdim, tol, check_interval);
         if (prec < tol)
         {
             return prec;
