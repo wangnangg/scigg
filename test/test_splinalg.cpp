@@ -24,8 +24,8 @@ TEST(test_splinalg, sor_method_sum)
                              false);
     auto pi = vector(4, 1.0);
     auto b = vector(4, 0.0);
-    real_t prec = linsv_sor_method(Q.transpose(), pi, b, 1.0, 1.2, tol,
-                                   max_iter, check_interval);
+    real_t prec = spsolve_sor_method(Q.transpose(), pi, b, 1.0, 1.2, tol,
+                                     max_iter, check_interval);
     print(Q);
     print(pi);
     print(dot(Q.transpose(), pi));
@@ -47,8 +47,8 @@ TEST(test_splinalg, sor_method1)
     blas_scale(-1.0, pi);
     auto x = vector(pi.dim(), 0.0);
     real_t w = 1.2;
-    real_t prec = linsv_sor_method(QTT.transpose(), x, pi, w, tol, max_iter,
-                                   check_interval);
+    real_t prec = spsolve_sor_method(QTT.transpose(), x, pi, w, tol, max_iter,
+                                     check_interval);
     ASSERT_LT(prec, tol);
     print(prec);
     print(x);
@@ -68,8 +68,8 @@ TEST(test_splinalg, sor_method2)
     blas_scale(-1.0, pi);
     auto x = vector(pi.dim(), 0.0);
     real_t w = 1.2;
-    real_t prec = linsv_sor_method(QTT.transpose(), x, pi, w, tol, max_iter,
-                                   check_interval);
+    real_t prec = spsolve_sor_method(QTT.transpose(), x, pi, w, tol, max_iter,
+                                     check_interval);
     ASSERT_LT(prec, tol);
     print(prec);
     print(x);
@@ -130,7 +130,7 @@ TEST(test_splinalg, gmres_method)
     auto pi = create_vector(4.0, {1.0, 0, 0, 0});
     scale(pi, -1.0);
     auto tau = vector(4, 0.0);
-    linsv_gmres_gms(QTT.transpose(), tau, pi, 4, 1e-6, 4);
+    spsolve_gmres_gms(QTT.transpose(), tau, pi, 4, 1e-6, 4);
 
     std::cout << "tau ";
     print(tau);
@@ -153,7 +153,7 @@ TEST(test_splinalg, restart_gmres_method)
     scale(pi, -1.0);
     auto tau = vector(4, 0.0);
     real_t prec =
-        linsv_restart_gmres_gms(QTT.transpose(), tau, pi, 2, tol, 100, 2);
+        spsolve_restart_gmres_gms(QTT.transpose(), tau, pi, 2, tol, 100, 2);
     std::cout << "tau ";
     print(tau);
     print(QTT);

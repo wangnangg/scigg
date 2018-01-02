@@ -26,4 +26,30 @@ void dot(vector_mutable_view y, spmatrix_const_view A, vector_const_view x)
     // y = alpha * A * x + beta * y
     spblas_matrix_vector(1.0, A, x, 0.0, y);
 }
+
+matrix spmatrix2dense(spmatrix_const_view A)
+{
+    matrix M(A.m(), A.n(), 0.0);
+    if (A.is_compressed_row())
+    {
+        for (size_t i = 0; i < A.ldim(); i++)
+        {
+            for (const auto& e : A[i])
+            {
+                M(i, e.idx) = e.val;
+            }
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < A.ldim(); i++)
+        {
+            for (const auto& e : A[i])
+            {
+                M(e.idx, i) = e.val;
+            }
+        }
+    }
+    return M;
+}
 }

@@ -32,4 +32,34 @@ void solve_upper_tri(matrix_const_view U, vector_mutable_view b)
         b[i] /= U(i, i);
     }
 }
+
+void solve_lu(matrix_mutable_view A, vector_mutable_view b)
+{
+    assert(A.m() == A.n());
+    size_t N = A.m();
+    matrix_mutable_view b_(&b[0], N, 1, N, true);
+    lu_decomp(A, b_);
+    vector diag(N);
+    for (size_t i = 0; i < N; i++)  // save diag temporarily
+    {
+        diag[i] = A(i, i);
+        A(i, i) = 1.0;
+    }
+    solve_lower_tri(A, b);
+    for (size_t i = 0; i < N; i++)  // recover diag
+    {
+        A(i, i) = diag[i];
+    }
+    solve_upper_tri(A, b);
+}
+
+void solve_qr(matrix_mutable_view A, vector_mutable_view b)
+{
+    assert(A.m() == A.n());
+    size_t N = A.m();
+    vector tau(N);
+    qr_decomp_hr(A, tau);
+    qt_dot_vector(A, tau, b);
+    solve_upper_tri(A, b);
+}
 }

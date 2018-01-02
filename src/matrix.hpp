@@ -139,4 +139,6 @@ public:
 bool operator==(matrix_const_view m1, matrix_const_view m2);
 
 matrix create_matrix(size_t m, size_t n, const std::vector<double>& v);
+
+matrix identity_matrix(size_t m);
 }

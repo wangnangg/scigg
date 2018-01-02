@@ -99,7 +99,10 @@ void unpack_qr(matrix_const_view QR, vector_const_view tau_vec,
     assert(QR.n() == tau_vec.dim());
     size_t n = QR.n();
     fill(Q, 0.0);
-    set_diag(Q, 1.0);
+    for (size_t i = 0; i < Q.n(); i++)
+    {
+        Q(i, i) = 1.0;
+    }
     for (size_t i = 0; i < n; i++)
     {
         size_t k = n - i - 1;
@@ -144,6 +147,50 @@ void q_dot_vector(matrix_const_view QR, vector_const_view tau,
     {
         size_t k = QR.n() - i - 1;
         apply_householder_reflector(v.sub(k), tau[k], QR.col(k).sub(k));
+    }
+}
+
+// PA = LU, A will be replaced by L and U, the rows of P will be permuted
+void lu_decomp(matrix_mutable_view A, matrix_mutable_view P)
+{
+    assert(A.m() == A.n());
+    assert(P.m() == A.m());
+    size_t N = A.n();
+    for (size_t j = 0; j < N - 1; j++)
+    {
+        size_t pivot_idx = blas_abs_max_idx(A.col(j).sub(j)) + j;
+        if (j != pivot_idx)
+        {
+            blas_swap(A.row(j), A.row(pivot_idx));
+            blas_swap(P.row(j), P.row(pivot_idx));
+        }
+        auto rowj = A.row(j);
+        real_t pivot_val = A(j, j);
+        assert(pivot_val != 0.0);
+        for (size_t i = j + 1; i < N; i++)
+        {
+            real_t ratio = A(i, j) / pivot_val;
+            A(i, j) = ratio;
+            blas_axpy(-ratio, rowj.sub(j + 1), A.row(i).sub(j + 1));
+        }
+    }
+}
+
+// A will be replaced by U
+void unpack_lu(matrix_mutable_view A, matrix_mutable_view L)
+{
+    assert(A.m() == A.n());
+    assert(L.m() == L.n());
+    assert(A.m() == L.m());
+    size_t M = A.m();
+    for (size_t i = 0; i < M; i++)
+    {
+        for (size_t j = 0; j < i; j++)
+        {
+            L(i, j) = A(i, j);
+            A(i, j) = 0.0;
+        }
+        L(i, i) = 1.0;
     }
 }
 }

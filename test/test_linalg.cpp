@@ -264,3 +264,52 @@ TEST(test_linalg, least_square)
                         create_vector(3, {-0.0243225, -0.00982752, -0.0549788}),
                         1e-6));
 }
+
+TEST(test_linalg, lu_decomp)
+{
+    const auto A = create_matrix(3, 3,
+                                 {
+
+                                     12, -51, 4,   //
+                                     6, 167, -68,  //
+                                     -4, 24, -41,  //
+                                 });
+    matrix P = identity_matrix(3);
+    matrix U = A;
+    lu_decomp(U, P);
+    matrix L(A.m(), A.n());
+    unpack_lu(U, L);
+    ASSERT_TRUE(near_eq(P * A, L * U, 1e-6));
+}
+
+TEST(test_linalg, solve_lu)
+{
+    const auto A_ = create_matrix(3, 3,
+                                  {
+
+                                      12, -51, 4,   //
+                                      6, 167, -68,  //
+                                      -4, 24, -41,  //
+                                  });
+    const auto b_ = create_vector(3, {1, 2, 3});
+    matrix A = A_;
+    vector x = b_;
+    solve_lu(A, x);
+    ASSERT_TRUE(near_eq(A_ * x, b_, 1e-6));
+}
+
+TEST(test_linalg, solve_qr)
+{
+    const auto A_ = create_matrix(3, 3,
+                                  {
+
+                                      12, -51, 4,   //
+                                      6, 167, -68,  //
+                                      -4, 24, -41,  //
+                                  });
+    const auto b_ = create_vector(3, {1, 2, 3});
+    matrix A = A_;
+    vector x = b_;
+    solve_qr(A, x);
+    ASSERT_TRUE(near_eq(A_ * x, b_, 1e-6));
+}

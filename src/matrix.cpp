@@ -178,4 +178,14 @@ matrix create_matrix(size_t m, size_t n, const std::vector<double>& v)
     }
     return M;
 }
+
+matrix identity_matrix(size_t m)
+{
+    matrix M(m, m);
+    for (size_t i = 0; i < m; i++)
+    {
+        M(i, i) = 1.0;
+    }
+    return M;
+}
 }

@@ -36,9 +36,6 @@ void qt_dot_vector(matrix_const_view QR, vector_const_view tau,
 void q_dot_vector(matrix_const_view QR, vector_const_view tau,
                   vector_mutable_view v);
 
-// QR decomposition using Givens Rotation
-void qr_decomp_gr();
-
 // solve L x = b, b will be replaced with solution
 void solve_lower_tri(matrix_const_view L, vector_mutable_view b);
 
@@ -47,4 +44,16 @@ void solve_upper_tri(matrix_const_view U, vector_mutable_view b);
 
 // solve min||b - A x|| using QR decomposition, b will be replaced with solution
 void least_square_qr(matrix_mutable_view A, vector_mutable_view b);
+
+// PA = LU, A will be replaced by L and U, the rows of P will be permuted
+void lu_decomp(matrix_mutable_view A, matrix_mutable_view P);
+
+// A will be replaced by U
+void unpack_lu(matrix_mutable_view A, matrix_mutable_view L);
+
+// solve A * x = b using LU factorization. b will be replaced by x
+void solve_lu(matrix_mutable_view A, vector_mutable_view b);
+
+// solve A * x = b using QR factorization. b will be replaced by x
+void solve_qr(matrix_mutable_view A, vector_mutable_view b);
 }

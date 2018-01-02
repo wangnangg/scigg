@@ -80,16 +80,6 @@ void fill(matrix_mutable_view A, real_t val)
     }
 }
 
-void set_diag(matrix_mutable_view A, real_t val)
-{
-    fill(A, 0.0);
-    size_t iter = min(A.m(), A.n());
-    for (size_t i = 0; i < iter; i++)
-    {
-        A(i, i) = 1.0;
-    }
-}
-
 vector operator*(real_t alpha, vector_const_view x)
 {
     vector y(x.dim(), 0.0);

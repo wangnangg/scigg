@@ -1,5 +1,6 @@
 #pragma once
 
+#include "matrix.hpp"
 #include "spmatrix.hpp"
 #include "vector.hpp"
 
@@ -28,4 +29,6 @@ inline vector dot(spmatrix_const_view A, vector_const_view x)
     dot(y, A, x);
     return y;
 }
+
+matrix spmatrix2dense(spmatrix_const_view A);
 }

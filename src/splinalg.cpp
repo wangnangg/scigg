@@ -52,9 +52,9 @@ real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
     return max_diff(x_next, x);
 }
 
-real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
-                        vector_const_view b, real_t w, real_t tol,
-                        uint_t max_iter, uint_t check_interval)
+real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
+                          vector_const_view b, real_t w, real_t tol,
+                          uint_t max_iter, uint_t check_interval)
 {
     assert(A.m() == A.n());
     assert(A.m() == x.dim());
@@ -62,6 +62,8 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
     assert(A.is_compressed_row());
     vector x_next_(x.dim(), 0.0);
     vector_mutable_view x_next = x_next_;
+    vector res(x.dim());
+    real_t prec = 0;
     for (uint_t ii = 0; ii < max_iter / check_interval; ii++)
     {
         for (uint_t jj = 0; jj < check_interval; jj++)
@@ -90,18 +92,20 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
             }
             std::swap(x_next, x);
         }
-        real_t prec = max_diff(x_next, x);
+        copy(res, b);
+        spblas_matrix_vector(-1.0, A, x, 1.0, res);
+        prec = abs_max_val(res);
         if (prec < tol)
         {
             return prec;
         }
     }
-    return max_diff(x_next, x);
+    return prec;
 }
 
-real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
-                        vector_const_view b, real_t x_sum, real_t w, real_t tol,
-                        uint_t max_iter, uint_t check_interval)
+real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
+                          vector_const_view b, real_t x_sum, real_t w,
+                          real_t tol, uint_t max_iter, uint_t check_interval)
 {
     assert(A.m() == A.n());
     assert(A.m() == x.dim());
@@ -110,6 +114,8 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
     vector x_next_(x.dim(), 0.0);
     vector_mutable_view x_next = x_next_;
     size_t last_vec = A.ldim() - 1;
+    vector res(x.dim());
+    real_t prec = 0;
     for (uint_t ii = 0; ii < max_iter / check_interval; ii++)
     {
         for (uint_t jj = 0; jj < check_interval; jj++)
@@ -140,13 +146,15 @@ real_t linsv_sor_method(spmatrix_const_view A, vector_mutable_view x,
             x_next[last_vec] = (1 - w) * x[last_vec] + w * last_remain;
             std::swap(x_next, x);
         }
-        real_t prec = max_diff(x_next, x);
+        copy(res, b);
+        spblas_matrix_vector(-1.0, A, x, 1.0, res);
+        prec = abs_max_val(res);
         if (prec < tol)
         {
             return prec;
         }
     }
-    return max_diff(x_next, x);
+    return prec;
 }
 
 void compute_xm(vector_mutable_view xm, vector_const_view x0,
@@ -163,10 +171,10 @@ void compute_xm(vector_mutable_view xm, vector_const_view x0,
 }
 
 // solve Ax = b, A must be full rank.
-real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
-                       vector_const_view b,
-                       size_t kdim,  // dim of krylov space
-                       real_t tol, uint_t check_interval)
+real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
+                         vector_const_view b,
+                         size_t kdim,  // dim of krylov space
+                         real_t tol, uint_t check_interval)
 {
     assert(A.m() == A.n());
     if (kdim > A.n())
@@ -229,16 +237,16 @@ real_t linsv_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
     return prec;
 }
 
-real_t linsv_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
-                               vector_const_view b,
-                               size_t kdim,  // dim of krylov space
-                               real_t tol, uint_t max_iter,
-                               uint_t check_interval)
+real_t spsolve_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
+                                 vector_const_view b,
+                                 size_t kdim,  // dim of krylov space
+                                 real_t tol, uint_t max_iter,
+                                 uint_t check_interval)
 {
     real_t prec = 0;
     for (uint_t ii = 0; ii < max_iter; ii++)
     {
-        prec = linsv_gmres_gms(A, x, b, kdim, tol, check_interval);
+        prec = spsolve_gmres_gms(A, x, b, kdim, tol, check_interval);
         if (prec < tol)
         {
             return prec;

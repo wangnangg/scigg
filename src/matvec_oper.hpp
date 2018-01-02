@@ -36,8 +36,6 @@ void fill(matrix_mutable_view A, real_t val);
 void copy(vector_mutable_view y, vector_const_view x);
 void copy(matrix_mutable_view Y, matrix_const_view X);
 
-void set_diag(matrix_mutable_view A, real_t val);
-
 inline void scale(vector_mutable_view x, real_t alpha) { blas_scale(alpha, x); }
 inline vector_mutable_view operator*=(vector_mutable_view x, real_t alpha)
 {
