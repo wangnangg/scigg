@@ -5,19 +5,27 @@ gtest_dir:=${curr_dir}/googletest/googletest
 src_dir:=${curr_dir}/src
 test_dir:=${curr_dir}/test
 example_dir:=${curr_dir}/example
+flags = -I${src_dir} -std=c++1z -Wall -Werror -MMD
+link_flags =-lstdc++ -lm -pthread -lblas
 ifeq ($(release), 1)
-	flags:=-I${src_dir} -std=c++1z -Wall -Werror -MMD -O3 -DNDEBUG
-	link_flags:=-lstdc++ -lm -pthread -lblas -O3 -DNDEBUG
+	flags += -O3 -DNDEBUG
+	link_flags += -O3 -DNDEBUG
 	build_dir:=${curr_dir}/build/release
 else
   ifeq ($(profile), 1)
-	  flags:=-I${src_dir} -std=c++1z -Wall -Werror -MMD -g -O3 -pg -no-pie
-	  link_flags:=-lstdc++ -lm -pthread -lblas -g -O3 -no-pie
+	  flags += -g -O3 -pg -no-pie
+	  link_flags += -g -O3 -no-pie
 	  build_dir:=${curr_dir}/build/profile
   else
-	  flags:=-I${src_dir} -std=c++1z -Wall -Werror -MMD -g
-	  link_flags:=-lstdc++ -lm -pthread -lblas -g
+    ifeq ($(coverage), 1)
+      flags += -g -ftest-coverage -fprofile-arcs
+	  link_flags += -g -fprofile-arcs
+	  build_dir:=${curr_dir}/build/coverage
+    else
+	  flags += -g
+	  link_flags += -g
 	  build_dir:=${curr_dir}/build/debug
+    endif
   endif
 endif
 test_build_dir:=${build_dir}/test
