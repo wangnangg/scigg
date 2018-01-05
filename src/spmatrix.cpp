@@ -7,35 +7,31 @@ namespace markovgg
 spmatrix_mutable_view::spmatrix_mutable_view(spmatrix& mat)
     : spmatrix_base(mat.m(), mat.n(), mat.is_compressed_row()),
       _ptr(&mat._ptr[0]),
-      _data(&mat._data[0])
+      _idx(&mat._idx[0]),
+      _val(&mat._val[0])
 {
 }
 
 spmatrix_const_view::spmatrix_const_view(const spmatrix& mat)
     : spmatrix_base(mat.m(), mat.n(), mat.is_compressed_row()),
       _ptr(&mat._ptr[0]),
-      _data(&mat._data[0])
+      _idx(&mat._idx[0]),
+      _val(&mat._val[0])
 {
 }
 
-bool cmp_spsmat_cs_entry(const spmat_cs_entry& e1, const spmat_cs_entry& e2)
+real_t bin_search(spmat_vec_const_view view, size_t idx, real_t def_val)
 {
-    return e1.idx < e2.idx;
-}
-const spmat_cs_entry& bin_search(const spmat_cs_entry* first,
-                                 const spmat_cs_entry* last,
-                                 const spmat_cs_entry& value,
-                                 bool (*cmp)(const spmat_cs_entry&,
-                                             const spmat_cs_entry&))
-{
-    first = std::lower_bound(first, last, value, cmp);
-    if (first != last && !cmp(value, *first))
+    const size_t* begin = view.idx;
+    const size_t* end = view.idx + view.nnz;
+    const size_t* first = std::lower_bound(begin, end, idx);
+    if (first != end && *first == idx)
     {
-        return *first;
+        return view.val[first - begin];
     }
     else
     {
-        return value;
+        return def_val;
     }
 }
 
@@ -43,17 +39,13 @@ real_t spmatrix_get_entry(spmatrix_const_view mat, size_t row, size_t col)
 {
     if (mat.is_compressed_row())
     {
-        auto target = spmat_cs_entry{col, 0.0};
         auto view = mat[row];
-        return bin_search(view.begin(), view.end(), target, cmp_spsmat_cs_entry)
-            .val;
+        return bin_search(view, col, 0.0);
     }
     else
     {
-        auto target = spmat_cs_entry{row, 0.0};
         auto view = mat[col];
-        return bin_search(view.begin(), view.end(), target, cmp_spsmat_cs_entry)
-            .val;
+        return bin_search(view, row, 0.0);
     }
 }
 
@@ -117,70 +109,78 @@ spmatrix spmatrix_creator::create(bool is_row_compressed)
     if (is_row_compressed)
     {
         std::sort(_data.begin(), _data.end(), cmp_CPR_ROW);
-        std::vector<size_t> idx;
-        idx.reserve(_m + 1);
-        std::vector<spmat_cs_entry> val;
-        val.reserve(_data.size());
-        idx.push_back(0);
+        std::vector<size_t> ptr_list;
+        ptr_list.reserve(_m + 1);
+        ptr_list.push_back(0);
+        std::vector<size_t> idx_list;
+        idx_list.reserve(_data.size());
+        std::vector<real_t> val_list;
+        val_list.reserve(_data.size());
         auto itor = _data.begin();
         for (size_t i = 0; i < _m; i++)
         {
             size_t counter = 0;
             while (itor != _data.end() && itor->row == i)
             {
-                spmat_cs_entry entry{itor->col, itor->val};
+                size_t idx = itor->col;
+                real_t val = itor->val;
                 itor += 1;
                 while (itor != _data.end() && itor->row == i &&
-                       itor->col == entry.idx)
+                       itor->col == idx)
                 {
-                    entry.val += itor->val;
+                    val += itor->val;
                     itor += 1;
                 }
-                if (entry.val != 0.0)
+                if (val != 0.0)
                 {
-                    val.push_back(entry);
+                    idx_list.push_back(idx);
+                    val_list.push_back(val);
                     counter += 1;
                 }
             }
-            idx.push_back(counter + idx[i]);
+            ptr_list.push_back(counter + ptr_list[i]);
         }
-        assert(_m + 1 >= idx.size());
-        return spmatrix(_m, _n, is_row_compressed, std::move(idx),
-                        std::move(val));
+        assert(_m + 1 == ptr_list.size());
+        return spmatrix(_m, _n, is_row_compressed, std::move(ptr_list),
+                        std::move(idx_list), std::move(val_list));
     }
     else
     {
         std::sort(_data.begin(), _data.end(), cmp_CPR_COL);
-        std::vector<size_t> idx;
-        idx.reserve(_n + 1);
-        std::vector<spmat_cs_entry> val;
-        val.reserve(_data.size());
-        idx.push_back(0);
+        std::vector<size_t> ptr_list;
+        ptr_list.reserve(_n + 1);
+        ptr_list.push_back(0);
+        std::vector<size_t> idx_list;
+        idx_list.reserve(_data.size());
+        std::vector<real_t> val_list;
+        val_list.reserve(_data.size());
         auto itor = _data.begin();
         for (size_t i = 0; i < _n; i++)
         {
             size_t counter = 0;
             while (itor != _data.end() && itor->col == i)
             {
-                spmat_cs_entry entry{itor->row, itor->val};
+                size_t idx = itor->row;
+                real_t val = itor->val;
                 itor += 1;
                 while (itor != _data.end() && itor->col == i &&
-                       itor->row == entry.idx)
+                       itor->row == idx)
                 {
-                    entry.val += itor->val;
+                    val += itor->val;
                     itor += 1;
                 }
-                if (entry.val != 0.0)
+                if (val != 0.0)
                 {
-                    val.push_back(entry);
+                    idx_list.push_back(idx);
+                    val_list.push_back(val);
                     counter += 1;
                 }
             }
-            idx.push_back(counter + idx[i]);
+            ptr_list.push_back(counter + ptr_list[i]);
         }
-        assert(_n + 1 >= idx.size());
-        return spmatrix(_m, _n, is_row_compressed, std::move(idx),
-                        std::move(val));
+        assert(_n + 1 == ptr_list.size());
+        return spmatrix(_m, _n, is_row_compressed, std::move(ptr_list),
+                        std::move(idx_list), std::move(val_list));
     }
 }
 }

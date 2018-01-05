@@ -18,7 +18,6 @@ std::ostream& operator<<(std::ostream& os, const vector_mutable_view& v);
 std::ostream& operator<<(std::ostream& os, const spmatrix& mat);
 std::ostream& operator<<(std::ostream& os, const spmatrix_const_view& mat);
 std::ostream& operator<<(std::ostream& os, const spmatrix_mutable_view& mat);
-std::ostream& operator<<(std::ostream& os, const spmat_cs_entry& e);
 std::ostream& operator<<(std::ostream& os, const spmat_triplet_entry& e);
 template <class T>
 std::ostream& operator<<(std::ostream& os, const std::vector<T>& v)

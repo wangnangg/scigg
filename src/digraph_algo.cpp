@@ -21,9 +21,15 @@ bool recursive_visit(spmatrix_const_view mat, std::vector<scc_node>& node_info,
     depth += 1;
     node_stack.push_back(src_idx);
     bool is_bottom = true;
-    for (const auto& e : mat[src_idx])
+    auto view = mat[src_idx];
+    for (size_t i = 0; i < view.nnz; i++)
     {
-        size_t dst_idx = e.idx;
+        if (view.val[i] == 0.0)
+        {
+            continue;
+        }
+        size_t idx = view.idx[i];
+        size_t dst_idx = idx;
         if (dst_idx != src_idx)
         {
             auto& dst_node_info = node_info[dst_idx];

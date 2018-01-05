@@ -6,8 +6,8 @@
 namespace markovgg
 {
 inline real_t abs(real_t v) { return v >= 0 ? v : -v; }
-inline real_t max(size_t x, size_t y) { return x > y ? x : y; }
-inline real_t min(size_t x, size_t y) { return x > y ? y : x; }
+inline real_t max(real_t x, real_t y) { return x > y ? x : y; }
+inline real_t min(real_t x, real_t y) { return x > y ? y : x; }
 
 inline bool near_zero(real_t v1, real_t tol)
 {

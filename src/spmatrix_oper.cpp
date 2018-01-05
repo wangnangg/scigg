@@ -34,9 +34,12 @@ matrix spmatrix2dense(spmatrix_const_view A)
     {
         for (size_t i = 0; i < A.ldim(); i++)
         {
-            for (const auto& e : A[i])
+            auto view = A[i];
+            for (size_t j = 0; j < view.nnz; j++)
             {
-                M(i, e.idx) = e.val;
+                size_t idx = view.idx[j];
+                real_t val = view.val[j];
+                M(i, idx) = val;
             }
         }
     }
@@ -44,9 +47,12 @@ matrix spmatrix2dense(spmatrix_const_view A)
     {
         for (size_t i = 0; i < A.ldim(); i++)
         {
-            for (const auto& e : A[i])
+            auto view = A[i];
+            for (size_t j = 0; j < view.nnz; j++)
             {
-                M(e.idx, i) = e.val;
+                size_t idx = view.idx[j];
+                real_t val = view.val[j];
+                M(idx, i) = val;
             }
         }
     }

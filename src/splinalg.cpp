@@ -72,19 +72,22 @@ real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
             {
                 real_t diag = 0;
                 real_t remain = b[i];
-                for (const auto& e : A[i])
+                auto view = A[i];
+                for (size_t j = 0; j < view.nnz; j++)
                 {
-                    if (e.idx < i)
+                    size_t idx = view.idx[j];
+                    real_t val = view.val[j];
+                    if (idx < i)
                     {
-                        remain -= e.val * x_next[e.idx];
+                        remain -= val * x_next[idx];
                     }
-                    else if (e.idx > i)
+                    else if (idx > i)
                     {
-                        remain -= e.val * x[e.idx];
+                        remain -= val * x[idx];
                     }
                     else
                     {
-                        diag = e.val;
+                        diag = val;
                     }
                 }
                 assert(diag != 0);
@@ -125,19 +128,22 @@ real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
             {
                 real_t diag = 0;
                 real_t remain = b[i];
-                for (const auto& e : A[i])
+                auto view = A[i];
+                for (size_t j = 0; j < view.nnz; j++)
                 {
-                    if (e.idx < i)
+                    size_t idx = view.idx[j];
+                    real_t val = view.val[j];
+                    if (idx < i)
                     {
-                        remain -= e.val * x_next[e.idx];
+                        remain -= val * x_next[idx];
                     }
-                    else if (e.idx > i)
+                    else if (idx > i)
                     {
-                        remain -= e.val * x[e.idx];
+                        remain -= val * x[idx];
                     }
                     else
                     {
-                        diag = e.val;
+                        diag = val;
                     }
                 }
                 x_next[i] = (1 - w) * x[i] + w / diag * remain;
@@ -253,5 +259,12 @@ real_t spsolve_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
         }
     }
     return prec;
+}
+
+real_t spdecomp_ilu(spmatrix_mutable_view A)
+{
+    assert(A.m() == A.n());
+    assert(A.is_compressed_row());
+    return 0;
 }
 }

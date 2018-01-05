@@ -80,11 +80,6 @@ std::ostream& operator<<(std::ostream& os, const spmatrix_mutable_view& mat)
     return os << spmatrix_const_view(mat);
 }
 
-std::ostream& operator<<(std::ostream& os, const spmat_cs_entry& e)
-{
-    return std::cout << "{" << e.idx << ", " << e.val << "}";
-}
-
 std::ostream& operator<<(std::ostream& os, const spmat_triplet_entry& e)
 {
     return std::cout << "{" << e.row << ", " << e.col << ", " << e.val << "}";

@@ -5,7 +5,7 @@ gtest_dir:=${curr_dir}/googletest/googletest
 src_dir:=${curr_dir}/src
 test_dir:=${curr_dir}/test
 example_dir:=${curr_dir}/example
-flags = -I${src_dir} -std=c++1z -Wall -Werror -MMD
+flags = -I${src_dir} -std=c++1z -Wall -Wfloat-conversion -Wsign-conversion -Werror -MMD
 link_flags =-lstdc++ -lm -pthread -lblas
 ifeq ($(release), 1)
 	flags += -O3 -DNDEBUG

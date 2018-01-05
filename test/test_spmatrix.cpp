@@ -2,6 +2,7 @@
 #include "debug_utils.hpp"
 #include "gtest/gtest.h"
 #include "spmatrix.hpp"
+#include "spmatrix_oper.hpp"
 
 TEST(test_spmatrix, create)
 {
@@ -18,4 +19,56 @@ TEST(test_spmatrix, create)
     ASSERT_EQ(mat2(2, 3), 1.0);
     ASSERT_EQ(mat2(1, 2), 2.0);
     ASSERT_EQ(mat2(0, 0), 0.0);
+}
+
+TEST(test_spmatrix, spmatrix2dense_crs)
+{
+    spmatrix spm = create_spmatrix(5, 4,
+                                   {
+                                       1,  2,  3,  4,   //
+                                       5,  6,  7,  8,   //
+                                       9,  10, 11, 12,  //
+                                       13, 14, 15, 16,  //
+                                       17, 18, 19, 20   //
+                                   },
+                                   true);
+    print(spm);
+    matrix dsm = spmatrix2dense(spm);
+    print(dsm);
+    ASSERT_EQ(dsm, create_matrix(5, 4,
+                                 {
+                                     1,  2,  3,  4,   //
+                                     5,  6,  7,  8,   //
+                                     9,  10, 11, 12,  //
+                                     13, 14, 15, 16,  //
+                                     17, 18, 19, 20   //
+                                 }
+
+                                 ));
+}
+
+TEST(test_spmatrix, spmatrix2dense_ccs)
+{
+    spmatrix spm = create_spmatrix(5, 4,
+                                   {
+                                       1,  2,  3,  4,   //
+                                       5,  6,  7,  8,   //
+                                       9,  10, 11, 12,  //
+                                       13, 14, 15, 16,  //
+                                       17, 18, 19, 20   //
+                                   },
+                                   false);
+    print(spm);
+    matrix dsm = spmatrix2dense(spm);
+    print(dsm);
+    ASSERT_EQ(dsm, create_matrix(5, 4,
+                                 {
+                                     1,  2,  3,  4,   //
+                                     5,  6,  7,  8,   //
+                                     9,  10, 11, 12,  //
+                                     13, 14, 15, 16,  //
+                                     17, 18, 19, 20   //
+                                 }
+
+                                 ));
 }

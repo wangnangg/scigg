@@ -14,9 +14,10 @@ void spblas_matrix_vector(real_t alpha, spmatrix_const_view A,
     {
         for (size_t i = 0; i < y.dim(); i++)
         {
-            for (const auto& e : A[i])
+            auto view = A[i];
+            for (size_t j = 0; j < view.nnz; j++)
             {
-                y[i] += alpha * e.val * x[e.idx];
+                y[i] += alpha * view.val[j] * x[view.idx[j]];
             }
         }
     }
@@ -24,9 +25,10 @@ void spblas_matrix_vector(real_t alpha, spmatrix_const_view A,
     {
         for (size_t i = 0; i < x.dim(); i++)
         {
-            for (const auto& e : A[i])
+            auto view = A[i];
+            for (size_t j = 0; j < view.nnz; j++)
             {
-                y[e.idx] += alpha * e.val * x[i];
+                y[view.idx[j]] += alpha * view.val[j] * x[i];
             }
         }
     }
