@@ -8,13 +8,11 @@ using std::size_t;
 typedef double real_t;
 typedef int int_t;
 typedef unsigned int uint_t;
-class msg_exception : public std::exception
+struct msg_exception : public std::exception
 {
-public:
-    msg_exception(std::string msg) : _msg(std::move(msg)) {}
-    const char* what() const noexcept override { return _msg.c_str(); }
-
-private:
-    std::string _msg;
+    std::string msg;
+    msg_exception() = default;
+    msg_exception(std::string msg) : msg(std::move(msg)) {}
+    const char* what() const noexcept override { return msg.c_str(); }
 };
 }
