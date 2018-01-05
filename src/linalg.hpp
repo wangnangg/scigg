@@ -4,7 +4,7 @@ namespace markovgg
 {
 // QR decomposition using Modified Gram-Schmidt
 // A will be replaced by Q
-void qr_decomp_mgs(matrix_mutable_view A, matrix_mutable_view R);
+void decomp_qr_mgs(matrix_mutable_view A, matrix_mutable_view R);
 
 // find vector v, with v[0] = 1, so that (I - tau v v') w zeros w[1:n]. v[1:n]
 // is stored in w[1:n] and w[0] = (Px)[0]
@@ -24,7 +24,7 @@ void apply_householder_reflector(matrix_mutable_view A, real_t tau,
 // the upper triangular of A will be replaced by R
 // the strict lower part will contain all the reflection vectors with v[0] = 1
 // implicitly
-void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec);
+void decomp_qr_hr(matrix_mutable_view A, vector_mutable_view tau_vec);
 
 // unpack Q, R from QR and tau, where the strict lower part of V are reflection
 // vectors from QR decomposition using householder reflection
@@ -46,7 +46,7 @@ void solve_upper_tri(matrix_const_view U, vector_mutable_view b);
 void least_square_qr(matrix_mutable_view A, vector_mutable_view b);
 
 // PA = LU, A will be replaced by L and U, the rows of P will be permuted
-void lu_decomp(matrix_mutable_view A, matrix_mutable_view P);
+void decomp_lu(matrix_mutable_view A, matrix_mutable_view P);
 
 // A will be replaced by U
 void unpack_lu(matrix_mutable_view A, matrix_mutable_view L);

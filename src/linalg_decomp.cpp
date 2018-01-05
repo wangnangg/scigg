@@ -6,7 +6,7 @@
 
 namespace markovgg
 {
-void qr_decomp_mgs(matrix_mutable_view A, matrix_mutable_view R)
+void decomp_qr_mgs(matrix_mutable_view A, matrix_mutable_view R)
 {
     assert(A.m() >= A.n());
     assert(R.m() == R.n());
@@ -71,7 +71,7 @@ void apply_householder_reflector(matrix_mutable_view A, real_t tau,
     vm[0] = v0;
 }
 
-void qr_decomp_hr(matrix_mutable_view A, vector_mutable_view tau_vec)
+void decomp_qr_hr(matrix_mutable_view A, vector_mutable_view tau_vec)
 {
     assert(A.m() >= A.n());
     assert(tau_vec.dim() == A.n());
@@ -151,7 +151,7 @@ void q_dot_vector(matrix_const_view QR, vector_const_view tau,
 }
 
 // PA = LU, A will be replaced by L and U, the rows of P will be permuted
-void lu_decomp(matrix_mutable_view A, matrix_mutable_view P)
+void decomp_lu(matrix_mutable_view A, matrix_mutable_view P)
 {
     assert(A.m() == A.n());
     assert(P.m() == A.m());

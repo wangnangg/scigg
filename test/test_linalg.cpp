@@ -5,7 +5,7 @@
 #include "linalg.hpp"
 #include "matvec_oper.hpp"
 
-TEST(test_linalg, qr_decomp_gms1)
+TEST(test_linalg, decomp_qr_gms1)
 {
     auto A = create_matrix(3, 3,
                            {
@@ -16,13 +16,13 @@ TEST(test_linalg, qr_decomp_gms1)
                            });
     auto Q = A;
     auto R = matrix(A.n(), A.n());
-    qr_decomp_mgs(Q, R);
+    decomp_qr_mgs(Q, R);
     print(A);
     print(Q);
     print(R);
     ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
 }
-TEST(test_linalg, qr_decomp_gms2)
+TEST(test_linalg, decomp_qr_gms2)
 {
     auto A = create_matrix(3, 3,
                            {
@@ -33,13 +33,13 @@ TEST(test_linalg, qr_decomp_gms2)
                            });
     auto Q = A;
     auto R = matrix(A.n(), A.n());
-    qr_decomp_mgs(Q, R);
+    decomp_qr_mgs(Q, R);
     print(A);
     print(Q);
     print(R);
     ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
 }
-TEST(test_linalg, qr_decomp_gms3)
+TEST(test_linalg, decomp_qr_gms3)
 {
     auto A = create_matrix(4, 3,
                            {
@@ -51,7 +51,7 @@ TEST(test_linalg, qr_decomp_gms3)
                            });
     auto Q = A;
     auto R = matrix(A.n(), A.n());
-    qr_decomp_mgs(Q, R);
+    decomp_qr_mgs(Q, R);
     print(A);
     print(Q);
     print(R);
@@ -94,7 +94,7 @@ TEST(test_linalg, householder3)
                         create_vector(3, {-blas_norm2(A.col(0)), 0, 0}), 1e-6));
 }
 
-TEST(test_linalg, qr_decomp_hr1)
+TEST(test_linalg, decomp_qr_hr1)
 {
     auto A = create_matrix(3, 3,
                            {
@@ -105,7 +105,7 @@ TEST(test_linalg, qr_decomp_hr1)
                            });
     auto QR = A;
     vector tau(A.n());
-    qr_decomp_hr(QR, tau);
+    decomp_qr_hr(QR, tau);
     matrix Q(A.m(), A.n());
     matrix R(A.n(), A.n());
     std::cout << "A ";
@@ -121,7 +121,7 @@ TEST(test_linalg, qr_decomp_hr1)
     print(dot(Q, R));
     ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
 }
-TEST(test_linalg, qr_decomp_hr2)
+TEST(test_linalg, decomp_qr_hr2)
 {
     auto A = create_matrix(3, 3,
                            {
@@ -132,7 +132,7 @@ TEST(test_linalg, qr_decomp_hr2)
                            });
     auto QR = A;
     vector tau(A.n());
-    qr_decomp_hr(QR, tau);
+    decomp_qr_hr(QR, tau);
     matrix Q(A.m(), A.n());
     matrix R(A.n(), A.n());
     std::cout << "A ";
@@ -148,7 +148,7 @@ TEST(test_linalg, qr_decomp_hr2)
     print(dot(Q, R));
     ASSERT_TRUE(near_eq(A, dot(Q, R), 1e-8));
 }
-TEST(test_linalg, qr_decomp_hr3)
+TEST(test_linalg, decomp_qr_hr3)
 {
     auto A = create_matrix(4, 3,
                            {
@@ -160,7 +160,7 @@ TEST(test_linalg, qr_decomp_hr3)
                            });
     auto QR = A;
     vector tau(A.n());
-    qr_decomp_hr(QR, tau);
+    decomp_qr_hr(QR, tau);
     matrix Q(A.m(), A.n());
     matrix R(A.n(), A.n());
     std::cout << "A ";
@@ -190,7 +190,7 @@ TEST(test_linalg, qr_compact_oper)
     const auto v = create_vector(4, {1, 2, 3, 4});
     auto QR = A;
     vector tau(A.n());
-    qr_decomp_hr(QR, tau);
+    decomp_qr_hr(QR, tau);
     matrix Q(A.m(), A.n());
     matrix R(A.n(), A.n());
     unpack_qr(QR, tau, Q, R);
@@ -264,7 +264,7 @@ TEST(test_linalg, least_square)
                         1e-6));
 }
 
-TEST(test_linalg, lu_decomp)
+TEST(test_linalg, decomp_lu)
 {
     const auto A = create_matrix(3, 3,
                                  {
@@ -275,7 +275,7 @@ TEST(test_linalg, lu_decomp)
                                  });
     matrix P = identity_matrix(3);
     matrix U = A;
-    lu_decomp(U, P);
+    decomp_lu(U, P);
     matrix L(A.m(), A.n());
     unpack_lu(U, L);
     ASSERT_TRUE(near_eq(P * A, L * U, 1e-6));
