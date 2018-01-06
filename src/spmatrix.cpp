@@ -20,32 +20,33 @@ spmatrix_const_view::spmatrix_const_view(const spmatrix& mat)
 {
 }
 
-real_t bin_search(spmat_vec_const_view view, size_t idx, real_t def_val)
-{
-    const size_t* begin = view.idx;
-    const size_t* end = view.idx + view.nnz;
-    const size_t* first = std::lower_bound(begin, end, idx);
-    if (first != end && *first == idx)
-    {
-        return view.val[first - begin];
-    }
-    else
-    {
-        return def_val;
-    }
-}
-
 real_t spmatrix_get_entry(spmatrix_const_view mat, size_t row, size_t col)
 {
     if (mat.is_compressed_row())
     {
         auto view = mat[row];
-        return bin_search(view, col, 0.0);
+        auto entry_ptr = search_spvec_entry(view, col);
+        if (entry_ptr)
+        {
+            return *entry_ptr;
+        }
+        else
+        {
+            return 0.0;
+        }
     }
     else
     {
         auto view = mat[col];
-        return bin_search(view, row, 0.0);
+        auto entry_ptr = search_spvec_entry(view, row);
+        if (entry_ptr)
+        {
+            return *entry_ptr;
+        }
+        else
+        {
+            return 0.0;
+        }
     }
 }
 

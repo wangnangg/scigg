@@ -43,4 +43,6 @@ real_t spsolve_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
                                  size_t kdim,  // dim of krylov space
                                  real_t tol, uint_t max_iter,
                                  uint_t check_interval);
+
+void spdecomp_ilu(spmatrix_mutable_view A);
 }

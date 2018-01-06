@@ -151,7 +151,7 @@ void q_dot_vector(matrix_const_view QR, vector_const_view tau,
 }
 
 // PA = LU, A will be replaced by L and U, the rows of P will be permuted
-void decomp_lu(matrix_mutable_view A, matrix_mutable_view P)
+void decomp_lup(matrix_mutable_view A, matrix_mutable_view P)
 {
     assert(A.m() == A.n());
     assert(P.m() == A.m());
@@ -166,12 +166,42 @@ void decomp_lu(matrix_mutable_view A, matrix_mutable_view P)
         }
         auto rowj = A.row(j);
         real_t pivot_val = A(j, j);
-        assert(pivot_val != 0.0);
+        if (pivot_val == 0.0)
+        {
+            throw matrix_value_error();
+        }
         for (size_t i = j + 1; i < N; i++)
         {
             real_t ratio = A(i, j) / pivot_val;
-            A(i, j) = ratio;
-            blas_axpy(-ratio, rowj.sub(j + 1), A.row(i).sub(j + 1));
+            if (ratio != 0)
+            {
+                A(i, j) = ratio;
+                blas_axpy(-ratio, rowj.sub(j + 1), A.row(i).sub(j + 1));
+            }
+        }
+    }
+}
+
+void decomp_lu(matrix_mutable_view A)
+{
+    assert(A.m() == A.n());
+    size_t N = A.n();
+    for (size_t j = 0; j < N - 1; j++)
+    {
+        auto rowj = A.row(j);
+        real_t pivot_val = A(j, j);
+        if (pivot_val == 0.0)
+        {
+            throw matrix_value_error();
+        }
+        for (size_t i = j + 1; i < N; i++)
+        {
+            real_t ratio = A(i, j) / pivot_val;
+            if (ratio != 0)
+            {
+                A(i, j) = ratio;
+                blas_axpy(-ratio, rowj.sub(j + 1), A.row(i).sub(j + 1));
+            }
         }
     }
 }

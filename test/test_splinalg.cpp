@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "debug_utils.hpp"
 #include "gtest/gtest.h"
+#include "linalg.hpp"
 #include "matvec_oper.hpp"
 #include "splinalg.hpp"
 #include "spmatrix_oper.hpp"
@@ -160,4 +161,45 @@ TEST(test_splinalg, restart_gmres_method)
     print(pi);
     ASSERT_LT(prec, tol);
     ASSERT_TRUE(near_eq(dot(QTT.transpose(), tau), pi, tol));
+}
+
+TEST(test_splinalg, spdecomp_ilu1)
+{
+    const auto A = create_spmatrix(4, 4,
+                                   {
+                                       -4, 2, 0, 1,  //
+                                       1, -6, 1, 3,  //
+                                       2, 1, -5, 1,  //
+                                       3, 2, 1, -6   //
+                                   },
+                                   true);
+    auto iLU = A;
+    spdecomp_ilu(iLU);
+    auto LU = spmatrix2dense(A);
+    decomp_lu(LU);
+    ASSERT_TRUE(near_eq(spmatrix2dense(iLU), LU, 1e-6));
+}
+
+TEST(test_splinalg, spdecomp_ilu2)
+{
+    const auto A = create_spmatrix(4, 4,
+                                   {
+                                       1, 2, 0, 1,   //
+                                       0, -6, 0, 3,  //
+                                       2, 0, -5, 0,  //
+                                       1, 0, 1, -6   //
+                                   },
+                                   true);
+    auto iLU = A;
+    spdecomp_ilu(iLU);
+    auto LU = spmatrix2dense(A);
+    decomp_lu(LU);
+    for (size_t i = 0; i < iLU.m(); i++)
+    {
+        auto view = iLU[i];
+        for (size_t j = 0; j < view.nnz; j++)
+        {
+            near_eq(LU(i, view.idx[j]), view.val[j], 1e-6);
+        }
+    }
 }

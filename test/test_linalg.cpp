@@ -264,6 +264,23 @@ TEST(test_linalg, least_square)
                         1e-6));
 }
 
+TEST(test_linalg, decomp_lup)
+{
+    const auto A = create_matrix(3, 3,
+                                 {
+
+                                     12, -51, 4,   //
+                                     6, 167, -68,  //
+                                     -4, 24, -41,  //
+                                 });
+    matrix P = identity_matrix(3);
+    matrix U = A;
+    decomp_lup(U, P);
+    matrix L(A.m(), A.n());
+    unpack_lu(U, L);
+    ASSERT_TRUE(near_eq(P * A, L * U, 1e-6));
+}
+
 TEST(test_linalg, decomp_lu)
 {
     const auto A = create_matrix(3, 3,
@@ -275,10 +292,10 @@ TEST(test_linalg, decomp_lu)
                                  });
     matrix P = identity_matrix(3);
     matrix U = A;
-    decomp_lu(U, P);
+    decomp_lu(U);
     matrix L(A.m(), A.n());
     unpack_lu(U, L);
-    ASSERT_TRUE(near_eq(P * A, L * U, 1e-6));
+    ASSERT_TRUE(near_eq(A, L * U, 1e-6));
 }
 
 TEST(test_linalg, solve_lu)

@@ -66,7 +66,7 @@ TEST(test_large, lu_circuit_1)
     const vector b_ = vector(read_array_format(bf).col(0));
     matrix U = A_;
     auto P = identity_matrix(A_.m());
-    decomp_lu(U, P);
+    decomp_lup(U, P);
     matrix L(A_.m(), A_.n(), 0.0);
     unpack_lu(U, L);
     ASSERT_TRUE(near_eq(L * U, P * A_, 1e-6));

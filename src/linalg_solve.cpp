@@ -38,7 +38,7 @@ void solve_lu(matrix_mutable_view A, vector_mutable_view b)
     assert(A.m() == A.n());
     size_t N = A.m();
     matrix_mutable_view b_(&b[0], N, 1, N, true);
-    decomp_lu(A, b_);
+    decomp_lup(A, b_);
     vector diag(N);
     for (size_t i = 0; i < N; i++)  // save diag temporarily
     {

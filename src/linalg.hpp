@@ -46,7 +46,8 @@ void solve_upper_tri(matrix_const_view U, vector_mutable_view b);
 void least_square_qr(matrix_mutable_view A, vector_mutable_view b);
 
 // PA = LU, A will be replaced by L and U, the rows of P will be permuted
-void decomp_lu(matrix_mutable_view A, matrix_mutable_view P);
+void decomp_lup(matrix_mutable_view A, matrix_mutable_view P);
+void decomp_lu(matrix_mutable_view A);
 
 // A will be replaced by U
 void unpack_lu(matrix_mutable_view A, matrix_mutable_view L);

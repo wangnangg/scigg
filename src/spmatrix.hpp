@@ -1,24 +1,10 @@
 #pragma once
 #include <cassert>
 #include <vector>
+#include "spvector.hpp"
 #include "type.hpp"
-
 namespace markovgg
 {
-struct spmat_vec_const_view
-{
-    size_t nnz;
-    const size_t* idx;
-    const real_t* val;
-};
-
-struct spmat_vec_mutable_view
-{
-    size_t nnz;
-    size_t* idx;
-    real_t* val;
-};
-
 class spmatrix_base
 {
 protected:
@@ -64,10 +50,10 @@ public:
     {
     }
     spmatrix_mutable_view(spmatrix& mat);
-    spmat_vec_mutable_view operator[](size_t i) const
+    spvec_mutable_view operator[](size_t i) const
     {
-        return spmat_vec_mutable_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
-                                      &_val[_ptr[i]]};
+        return spvec_mutable_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
+                                  &_val[_ptr[i]]};
     }
     real_t operator()(size_t row, size_t col) const;
     spmatrix_mutable_view transpose() const
@@ -99,10 +85,10 @@ public:
     {
     }
 
-    spmat_vec_const_view operator[](size_t i) const
+    spvec_const_view operator[](size_t i) const
     {
-        return spmat_vec_const_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
-                                    &_val[_ptr[i]]};
+        return spvec_const_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
+                                &_val[_ptr[i]]};
     }
     real_t operator()(size_t row, size_t col) const;
     spmatrix_const_view transpose() const
@@ -149,15 +135,15 @@ public:
         return spmatrix_mutable_view(n(), m(), !is_compressed_row(), &_ptr[0],
                                      &_idx[0], &_val[0]);
     }
-    spmat_vec_mutable_view operator[](size_t i)
+    spvec_mutable_view operator[](size_t i)
     {
-        return spmat_vec_mutable_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
-                                      &_val[_ptr[i]]};
+        return spvec_mutable_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
+                                  &_val[_ptr[i]]};
     }
-    spmat_vec_const_view operator[](size_t i) const
+    spvec_const_view operator[](size_t i) const
     {
-        return spmat_vec_const_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
-                                    &_val[_ptr[i]]};
+        return spvec_const_view{_ptr[i + 1] - _ptr[i], &_idx[_ptr[i]],
+                                &_val[_ptr[i]]};
     }
     real_t operator()(size_t row, size_t col) const;
 };
