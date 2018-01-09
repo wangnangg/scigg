@@ -70,63 +70,6 @@ real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
     return prec;
 }
 
-real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
-                          vector_const_view b, real_t x_sum, real_t w,
-                          real_t tol, uint_t max_iter, uint_t check_interval)
-{
-    assert(A.m() == A.n());
-    assert(A.m() == x.dim());
-    assert(A.m() == b.dim());
-    assert(A.is_compressed_row());
-    vector x_next_(x.dim(), 0.0);
-    vector_mutable_view x_next = x_next_;
-    size_t last_vec = A.ldim() - 1;
-    vector res(x.dim());
-    real_t prec = 0.0;
-    for (uint_t ii = 0; ii < max_iter / check_interval; ii++)
-    {
-        for (uint_t jj = 0; jj < check_interval; jj++)
-        {
-            real_t last_remain = x_sum;
-            for (size_t i = 0; i < last_vec; i++)
-            {
-                real_t diag = 0;
-                real_t remain = b[i];
-                auto view = A[i];
-                for (size_t j = 0; j < view.nnz; j++)
-                {
-                    size_t idx = view.idx[j];
-                    real_t val = view.val[j];
-                    if (idx < i)
-                    {
-                        remain -= val * x_next[idx];
-                    }
-                    else if (idx > i)
-                    {
-                        remain -= val * x[idx];
-                    }
-                    else
-                    {
-                        diag = val;
-                    }
-                }
-                x_next[i] = (1 - w) * x[i] + w / diag * remain;
-                last_remain -= x_next[i];
-            }
-            x_next[last_vec] = (1 - w) * x[last_vec] + w * last_remain;
-            std::swap(x_next, x);
-        }
-        copy(res, b);
-        spblas_matrix_vector(-1.0, A, x, 1.0, res);
-        prec = abs_max_val(res);
-        if (prec < tol)
-        {
-            return prec;
-        }
-    }
-    return prec;
-}
-
 void compute_xm(vector_mutable_view xm, vector_const_view x0,
                 const std::vector<vector>& Vm, vector_const_view ym)
 {

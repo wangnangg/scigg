@@ -11,8 +11,6 @@ static real_t tol = 1e-10;
 static uint_t max_iter = 1000;
 static uint_t check_interval = 10;
 
-void test_sor(spmatrix_const_view A, vector_const_view b, real_t w) {}
-
 TEST(test_splinalg, sor_method_sum)
 {
     auto Q = create_spmatrix(4, 4,
@@ -20,13 +18,14 @@ TEST(test_splinalg, sor_method_sum)
                                  -2, 2, 0, 0,  //
                                  1, -3, 2, 0,  //
                                  0, 1, -3, 2,  //
-                                 0, 0, 1, -1   //
+                                 1, 1, 1, 1    //
                              },
                              false);
-    auto pi = vector(4, 1.0);
+    auto pi = vector(4, 0.0);
     auto b = vector(4, 0.0);
-    real_t prec = spsolve_sor_method(Q.transpose(), pi, b, 1.0, 1.2, tol,
-                                     max_iter, check_interval);
+    b[3] = 1.0;
+    real_t prec = spsolve_sor_method(Q.transpose(), pi, b, 0.8, tol, max_iter,
+                                     check_interval);
     print(Q);
     print(pi);
     print(dot(Q.transpose(), pi));
