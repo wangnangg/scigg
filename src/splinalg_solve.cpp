@@ -58,6 +58,7 @@ void spsolve_upper_tri(spmatrix_const_view U, vector_mutable_view b)
         }
     }
 }
+
 void spsolve_lower_tri(spmatrix_const_view L, vector_mutable_view b)
 {
     assert(L.m() == L.n());
@@ -98,6 +99,48 @@ void spsolve_lower_tri(spmatrix_const_view L, vector_mutable_view b)
             b[i] /= *diag_ptr[i];
         }
     }
+}
+
+void spsolve_lower_tri_diag1(spmatrix_const_view L, vector_mutable_view b)
+{
+    assert(L.m() == L.n());
+    assert(L.m() == b.dim());
+    size_t N = L.n();
+    std::vector<const size_t*> diag_idx_ptr(N, nullptr);
+    for (size_t i = 0; i < N; i++)
+    {
+        auto vec = L[i];
+        diag_idx_ptr[i] = std::lower_bound(vec.idx, vec.idx + vec.nnz, i);
+    }
+    if (L.is_compressed_row())
+    {
+        for (size_t i = 1; i < N; i++)
+        {
+            auto row = L[i];
+            size_t count = static_cast<size_t>(diag_idx_ptr[i] - row.idx);
+            // entries before diagonal
+            spvec_const_view subrow(count, row.idx, row.val);
+            b[i] -= dot(subrow, b);
+        }
+    }
+    else
+    {
+        for (size_t i = 1; i < N; i++)
+        {
+            auto col = L[i - 1];
+            size_t skipped =
+                static_cast<size_t>(diag_idx_ptr[i - 1] - col.idx + 1);
+            spvec_const_view subcol(col.nnz - skipped, col.idx + skipped,
+                                    col.val + skipped);
+            spblas_axpy(-b[i - 1], subcol, b);
+        }
+    }
+}
+
+void spsolve_ilu(spmatrix_const_view iLU, vector_mutable_view b)
+{
+    spsolve_lower_tri_diag1(iLU, b);
+    spsolve_upper_tri(iLU, b);
 }
 
 real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,

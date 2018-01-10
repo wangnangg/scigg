@@ -341,3 +341,100 @@ TEST(test_splinalg, spsolve_upper_tri4)
     print(x);
     ASSERT_TRUE(near_eq(dot(U, x), b, 1e-6));
 }
+
+TEST(test_splinalg, spsolve_lower_tri_diag1_1)
+{
+    auto L = create_spmatrix(4, 4,
+                             {
+                                 2, 0, 0, 0,  //
+                                 2, 6, 0, 0,  //
+                                 0, 8, 2, 0,  //
+                                 4, 0, 3, 5   //
+                             },
+                             true);
+    auto L_real = create_spmatrix(4, 4,
+                                  {
+                                      1, 0, 0, 0,  //
+                                      2, 1, 0, 0,  //
+                                      0, 8, 1, 0,  //
+                                      4, 0, 3, 1   //
+                                  },
+                                  true);
+
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_lower_tri_diag1(L, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(L_real, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_lower_tri_diag1_2)
+{
+    auto U = create_spmatrix(4, 4,
+                             {
+                                 1, 2, 0, 4,  //
+                                 0, 6, 8, 0,  //
+                                 0, 0, 2, 3,  //
+                                 0, 0, 0, 5   //
+                             },
+                             true);
+    auto L = U.transpose();
+    auto L_real = create_spmatrix(4, 4,
+                                  {
+                                      1, 0, 0, 0,  //
+                                      2, 1, 0, 0,  //
+                                      0, 8, 1, 0,  //
+                                      4, 0, 3, 1   //
+                                  },
+                                  true);
+
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_lower_tri_diag1(L, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(L_real, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_lower_tri_diag1_3)
+{
+    auto L = create_spmatrix(4, 4,
+                             {
+                                 2, 0, 1, 0,  //
+                                 2, 6, 2, 0,  //
+                                 0, 8, 2, 4,  //
+                                 4, 0, 3, 5   //
+                             },
+                             true);
+    auto L_real = create_spmatrix(4, 4,
+                                  {
+                                      1, 0, 0, 0,  //
+                                      2, 1, 0, 0,  //
+                                      0, 8, 1, 0,  //
+                                      4, 0, 3, 1   //
+                                  },
+                                  true);
+
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_lower_tri_diag1(L, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(L_real, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_ilu)
+{
+    const auto A = create_spmatrix(4, 4,
+                                   {
+                                       -4, 2, 0, 1,  //
+                                       1, -6, 1, 3,  //
+                                       2, 1, -5, 1,  //
+                                       3, 2, 1, -6   //
+                                   },
+                                   true);
+    auto iLU = A;
+    spdecomp_ilu(iLU);
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_ilu(iLU, x);
+    ASSERT_TRUE(near_eq(dot(A, x), b, 1e-6));
+}

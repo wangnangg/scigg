@@ -52,6 +52,7 @@ real_t spsolve_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
 void spsolve_upper_tri(spmatrix_const_view U, vector_mutable_view b);
 // L * x = b; L is a lower triangular sparse matrix.
 void spsolve_lower_tri(spmatrix_const_view L, vector_mutable_view b);
+void spsolve_lower_tri_diag1(spmatrix_const_view L, vector_mutable_view b);
 
 // solve ilu: L * U * x = b
 void spsolve_ilu(spmatrix_const_view iLU, vector_mutable_view b);
