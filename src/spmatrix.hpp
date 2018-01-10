@@ -61,6 +61,7 @@ public:
         return spmatrix_mutable_view(n(), m(), !is_compressed_row(), _ptr, _idx,
                                      _val);
     }
+    size_t nnz() const { return _ptr[ldim()]; }
 };
 
 class spmatrix_const_view : public spmatrix_base
@@ -96,6 +97,7 @@ public:
         return spmatrix_const_view(n(), m(), !is_compressed_row(), _ptr, _idx,
                                    _val);
     }
+    size_t nnz() const { return _ptr[ldim()]; }
 };
 
 class spmatrix : public spmatrix_base
@@ -107,6 +109,11 @@ class spmatrix : public spmatrix_base
     friend class spmatrix_const_view;
 
 public:
+    spmatrix(spmatrix_const_view view, bool is_row_compressed);
+    explicit spmatrix(spmatrix_const_view view)
+        : spmatrix(view, view.is_compressed_row())
+    {
+    }
     spmatrix(size_t m, size_t n, bool is_row_compressed,
              std::vector<size_t> ptr, std::vector<size_t> idx,
              std::vector<real_t> val)
@@ -123,6 +130,7 @@ public:
         {
             assert(_ptr.size() - 1 == n);
         }
+        assert(_ptr[ldim()] == _val.size());
         assert(_idx.size() == _val.size());
     }
     spmatrix_const_view transpose() const
@@ -146,8 +154,8 @@ public:
                                 &_val[_ptr[i]]};
     }
     real_t operator()(size_t row, size_t col) const;
+    size_t nnz() const { return _ptr[ldim()]; }
 };
-
 struct spmat_triplet_entry
 {
     size_t row;

@@ -105,7 +105,8 @@ public:
         : matrix_base(m, n, col_major ? m : n, col_major), _data(m * n, val)
     {
     }
-    explicit matrix(matrix_const_view mat);
+    matrix(matrix_const_view mat, bool col_major);
+    explicit matrix(matrix_const_view mat) : matrix(mat, mat.is_col_major()) {}
     const real_t& operator()(size_t i, size_t j) const
     {
         assert(i < m() && j < n());

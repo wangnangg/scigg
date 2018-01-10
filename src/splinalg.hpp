@@ -34,19 +34,15 @@ real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
 real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
                          vector_const_view b,
                          size_t kdim,  // dim of krylov space
-                         real_t tol, uint_t check_interval);
-
-real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
-                         vector_const_view b,
-                         size_t kdim,  // dim of krylov space
                          real_t tol, uint_t check_interval,
-                         pre_condition Msolve);
+                         pre_condition Msolve = nullptr);
 
 real_t spsolve_restart_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
                                  vector_const_view b,
                                  size_t kdim,  // dim of krylov space
                                  real_t tol, uint_t max_iter,
-                                 uint_t check_interval);
+                                 uint_t check_interval,
+                                 pre_condition Msolve = nullptr);
 
 // U * x = b; U is a upper triangular sparse matrix.
 void spsolve_upper_tri(spmatrix_const_view U, vector_mutable_view b);

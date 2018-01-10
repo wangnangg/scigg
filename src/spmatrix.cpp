@@ -20,6 +20,52 @@ spmatrix_const_view::spmatrix_const_view(const spmatrix& mat)
 {
 }
 
+spmatrix::spmatrix(spmatrix_const_view view, bool is_row_compressed)
+    : spmatrix_base(view.m(), view.n(), is_row_compressed),
+      _ptr(is_row_compressed ? view.m() + 1 : view.n() + 1),
+      _idx(view.nnz()),
+      _val(view.nnz())
+{
+    if (view.is_compressed_row() == is_row_compressed)
+    {
+        std::copy(view._ptr, view._ptr + _ptr.size(), &_ptr[0]);
+        std::copy(view._idx, view._idx + _idx.size(), &_idx[0]);
+        std::copy(view._val, view._val + _val.size(), &_val[0]);
+    }
+    else
+    {
+        std::vector<size_t> counter(ldim(), 0);
+        for (size_t i = 0; i < view.ldim(); i++)
+        {
+            auto vec = view[i];
+            for (size_t j = 0; j < vec.nnz; j++)
+            {
+                size_t idx = vec.idx[j];
+                counter[idx] += 1;
+            }
+        }
+        size_t pos = 0;
+        _ptr[0] = pos;
+        for (size_t i = 0; i < counter.size(); i++)
+        {
+            pos += counter[i];
+            _ptr[i + 1] = pos;
+        }
+        for (size_t i = 0; i < view.ldim(); i++)
+        {
+            auto vec = view[i];
+            for (size_t j = 0; j < vec.nnz; j++)
+            {
+                size_t idx = vec.idx[j];
+                real_t val = vec.val[j];
+                size_t offset = _ptr[idx + 1] - counter[idx];
+                counter[idx] -= 1;
+                _val[offset] = val;
+                _idx[offset] = i;
+            }
+        }
+    }
+}
 real_t spmatrix_get_entry(spmatrix_const_view mat, size_t row, size_t col)
 {
     if (mat.is_compressed_row())

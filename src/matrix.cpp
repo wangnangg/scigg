@@ -16,16 +16,28 @@ matrix_const_view::matrix_const_view(const matrix_mutable_view& M)
 {
 }
 
-matrix::matrix(matrix_const_view mat)
-    : matrix_base(mat.m(), mat.n(), mat.is_col_major() ? mat.m() : mat.n(),
-                  mat.is_col_major()),
+matrix::matrix(matrix_const_view mat, bool col_major)
+    : matrix_base(mat.m(), mat.n(), col_major ? mat.m() : mat.n(), col_major),
       _data(mat.m() * mat.n())
 {
-    for (size_t i = 0; i < mat.m(); i++)
+    if (col_major == mat.is_col_major())
     {
-        for (size_t j = 0; j < mat.n(); j++)
+        for (size_t i = 0; i < mat.m(); i++)
         {
-            this->operator()(i, j) = mat(i, j);
+            for (size_t j = 0; j < mat.n(); j++)
+            {
+                this->operator()(i, j) = mat(i, j);
+            }
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < mat.m(); i++)
+        {
+            for (size_t j = 0; j < mat.n(); j++)
+            {
+                this->operator()(j, i) = mat(i, j);
+            }
         }
     }
 }

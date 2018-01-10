@@ -95,3 +95,20 @@ TEST(test_large, solve_qr_circuit_1)
     solve_qr(A, x);
     ASSERT_TRUE(near_eq(A_ * x, b_, tol));
 }
+
+TEST(test_large, precond_rgmres_chem_master1)
+{
+    std::ifstream matf("./test/matrix/chem_master1/chem_master1.mtx");
+    std::ifstream bf("./test/matrix/chem_master1/chem_master1_b.mtx");
+    const spmatrix A = read_cord_format(matf);
+    const vector b = vector(read_array_format(bf).col(0));
+    spmatrix iLU = A;
+    spdecomp_ilu(iLU);
+    vector x(b.dim(), 0.0);
+    real_t prec = spsolve_restart_gmres_gms(
+        A, x, b, 30, tol, 100, 10,
+        [&](vector_mutable_view x) -> void { spsolve_ilu(iLU, x); });
+
+    ASSERT_LT(prec, tol);
+    ASSERT_TRUE(near_eq(dot(A, x), b, tol));
+}

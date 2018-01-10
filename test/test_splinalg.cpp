@@ -438,3 +438,29 @@ TEST(test_splinalg, spsolve_ilu)
     spsolve_ilu(iLU, x);
     ASSERT_TRUE(near_eq(dot(A, x), b, 1e-6));
 }
+
+TEST(test_splinalg, precond_gmres_method)
+{
+    auto QTT = create_spmatrix(4, 4,
+                               {
+                                   -4, 2, 0, 1,  //
+                                   1, -6, 1, 3,  //
+                                   2, 1, -5, 1,  //
+                                   3, 2, 1, -6   //
+                               },
+                               false);
+    auto pi = create_vector(4.0, {1.0, 0, 0, 0});
+    scale(pi, -1.0);
+    auto tau = vector(4, 0.0);
+    auto iLU = spmatrix(QTT.transpose());
+    spdecomp_ilu(iLU);
+    spsolve_gmres_gms(
+        QTT.transpose(), tau, pi, 4, 1e-6, 4,
+        [&](vector_mutable_view x) -> void { spsolve_ilu(iLU, x); });
+
+    std::cout << "tau ";
+    print(tau);
+    print(QTT);
+    print(pi);
+    ASSERT_TRUE(near_eq(dot(QTT.transpose(), tau), pi, 1e-6));
+}
