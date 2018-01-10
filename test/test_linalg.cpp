@@ -212,7 +212,7 @@ TEST(test_linalg, qr_compact_oper)
     ASSERT_TRUE(near_eq(Qw, dot(Q, w.sub(0, 3)), 1e-6));
 }
 
-TEST(test_linalg, solve_triangular1)
+TEST(test_linalg, solve_upper_tri)
 {
     auto U = create_matrix(4, 4,
                            {
@@ -227,7 +227,7 @@ TEST(test_linalg, solve_triangular1)
     print(x);
     ASSERT_TRUE(near_eq(dot(U, x), b, 1e-6));
 }
-TEST(test_linalg, solve_triangular2)
+TEST(test_linalg, solve_lower_tri)
 {
     auto U = create_matrix(4, 4,
                            {

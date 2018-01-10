@@ -6,7 +6,7 @@
 
 namespace markovgg
 {
-// solve R x = b, b will be replaced with solution
+// solve L x = b, b will be replaced with solution
 void solve_lower_tri(matrix_const_view L, vector_mutable_view b)
 {
     assert(L.m() == L.n());
@@ -16,6 +16,17 @@ void solve_lower_tri(matrix_const_view L, vector_mutable_view b)
     {
         b[i] -= dot(L.row(i).sub(0, i), b.sub(0, i));
         b[i] /= L(i, i);
+    }
+}
+
+// solve L x = b, b will be replaced with solution. Diagonal is implicitly 1.
+void solve_lower_tri_diag1(matrix_const_view L, vector_mutable_view b)
+{
+    assert(L.m() == L.n());
+    assert(L.m() == b.dim());
+    for (size_t i = 1; i < L.m(); i++)
+    {
+        b[i] -= dot(L.row(i).sub(0, i), b.sub(0, i));
     }
 }
 
@@ -39,17 +50,7 @@ void solve_lu(matrix_mutable_view A, vector_mutable_view b)
     size_t N = A.m();
     matrix_mutable_view b_(&b[0], N, 1, N, true);
     decomp_lup(A, b_);
-    vector diag(N);
-    for (size_t i = 0; i < N; i++)  // save diag temporarily
-    {
-        diag[i] = A(i, i);
-        A(i, i) = 1.0;
-    }
-    solve_lower_tri(A, b);
-    for (size_t i = 0; i < N; i++)  // recover diag
-    {
-        A(i, i) = diag[i];
-    }
+    solve_lower_tri_diag1(A, b);
     solve_upper_tri(A, b);
 }
 

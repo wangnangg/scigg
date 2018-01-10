@@ -202,3 +202,142 @@ TEST(test_splinalg, spdecomp_ilu2)
         }
     }
 }
+TEST(test_splinalg, spsolve_lower_tri1)
+{
+    auto L = create_spmatrix(4, 4,
+                             {
+                                 1, 0, 0, 0,  //
+                                 2, 6, 0, 0,  //
+                                 0, 8, 2, 0,  //
+                                 4, 0, 3, 5   //
+                             },
+                             true);
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_lower_tri(L, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(L, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_lower_tri2)
+{
+    auto L = create_spmatrix(4, 4,
+                             {
+                                 1, 0, 0, 0,  //
+                                 2, 6, 0, 0,  //
+                                 0, 8, 2, 0,  //
+                                 4, 0, 3, 5   //
+                             },
+                             false);
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_lower_tri(L, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(L, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_lower_tri3)
+{
+    auto U = create_spmatrix(4, 4,
+                             {
+                                 1, 2, 0, 4,  //
+                                 0, 6, 8, 0,  //
+                                 0, 0, 2, 3,  //
+                                 0, 0, 0, 5   //
+                             },
+                             true);
+    auto L = U.transpose();
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_lower_tri(L, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(L, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_lower_tri4)
+{
+    auto U = create_spmatrix(4, 4,
+                             {
+                                 1, 2, 0, 4,  //
+                                 0, 6, 8, 0,  //
+                                 0, 0, 2, 3,  //
+                                 0, 0, 0, 5   //
+                             },
+                             false);
+    auto L = U.transpose();
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_lower_tri(L, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(L, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_upper_tri1)
+{
+    auto L = create_spmatrix(4, 4,
+                             {
+                                 1, 0, 0, 0,  //
+                                 2, 6, 0, 0,  //
+                                 0, 8, 2, 0,  //
+                                 4, 0, 3, 5   //
+                             },
+                             true);
+    auto U = L.transpose();
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_upper_tri(U, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(U, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_upper_tri2)
+{
+    auto L = create_spmatrix(4, 4,
+                             {
+                                 1, 0, 0, 0,  //
+                                 2, 6, 0, 0,  //
+                                 0, 8, 2, 0,  //
+                                 4, 0, 3, 5   //
+                             },
+                             false);
+    auto U = L.transpose();
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_upper_tri(U, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(U, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_upper_tri3)
+{
+    auto U = create_spmatrix(4, 4,
+                             {
+                                 1, 2, 0, 4,  //
+                                 0, 6, 8, 0,  //
+                                 0, 0, 2, 3,  //
+                                 0, 0, 0, 5   //
+                             },
+                             true);
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_upper_tri(U, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(U, x), b, 1e-6));
+}
+
+TEST(test_splinalg, spsolve_upper_tri4)
+{
+    auto U = create_spmatrix(4, 4,
+                             {
+                                 1, 2, 0, 4,  //
+                                 0, 6, 8, 0,  //
+                                 0, 0, 2, 3,  //
+                                 0, 0, 0, 5   //
+                             },
+                             false);
+    const vector b = create_vector(4, {1, 2, 3, 4});
+    vector x = b;
+    spsolve_upper_tri(U, x);
+    print(x);
+    ASSERT_TRUE(near_eq(dot(U, x), b, 1e-6));
+}

@@ -16,6 +16,90 @@ real_t abs_max_val(vector_const_view v)
     return abs(v[idx]);
 }
 
+void spsolve_upper_tri(spmatrix_const_view U, vector_mutable_view b)
+{
+    assert(U.m() == U.n());
+    assert(U.m() == b.dim());
+    size_t N = U.n();
+    std::vector<const real_t*> diag_ptr(N, nullptr);
+    for (size_t i = 0; i < N; i++)
+    {
+        diag_ptr[i] = search_spvec_entry(U[i], i);
+        if (diag_ptr[i] == nullptr || *diag_ptr[i] == 0.0)
+        {
+            throw matrix_value_error();
+        }
+    }
+    if (U.is_compressed_row())
+    {
+        b[N - 1] /= *diag_ptr[N - 1];
+        for (size_t ii = 1; ii < N; ii++)
+        {
+            size_t i = N - ii - 1;
+            auto row = U[i];
+            size_t skipped = static_cast<size_t>(diag_ptr[i] - row.val + 1);
+            spvec_const_view subrow(row.nnz - skipped, row.idx + skipped,
+                                    row.val + skipped);
+            b[i] -= dot(subrow, b);
+            b[i] /= *diag_ptr[i];
+        }
+    }
+    else
+    {
+        b[N - 1] /= *diag_ptr[N - 1];
+        for (size_t ii = 1; ii < N; ii++)
+        {
+            size_t i = N - ii - 1;
+            auto col = U[i + 1];
+            size_t count = static_cast<size_t>(diag_ptr[i + 1] - col.val);
+            spvec_const_view subcol(count, col.idx, col.val);
+            spblas_axpy(-b[i + 1], subcol, b);
+            b[i] /= *diag_ptr[i];
+        }
+    }
+}
+void spsolve_lower_tri(spmatrix_const_view L, vector_mutable_view b)
+{
+    assert(L.m() == L.n());
+    assert(L.m() == b.dim());
+    size_t N = L.n();
+    std::vector<const real_t*> diag_ptr(N, nullptr);
+    for (size_t i = 0; i < N; i++)
+    {
+        diag_ptr[i] = search_spvec_entry(L[i], i);
+        if (diag_ptr[i] == nullptr || *diag_ptr[i] == 0.0)
+        {
+            throw matrix_value_error();
+        }
+    }
+    if (L.is_compressed_row())
+    {
+        b[0] /= *diag_ptr[0];
+        for (size_t i = 1; i < N; i++)
+        {
+            auto row = L[i];
+            size_t count = static_cast<size_t>(diag_ptr[i] - row.val);
+            // entries before diagonal
+            spvec_const_view subrow(count, row.idx, row.val);
+            b[i] -= dot(subrow, b);
+            b[i] /= *diag_ptr[i];
+        }
+    }
+    else
+    {
+        b[0] /= *diag_ptr[0];
+        for (size_t i = 1; i < N; i++)
+        {
+            auto col = L[i - 1];
+            size_t skipped = static_cast<size_t>(diag_ptr[i - 1] - col.val + 1);
+            spvec_const_view subcol(col.nnz - skipped, col.idx + skipped,
+                                    col.val + skipped);
+            spblas_axpy(-b[i - 1], subcol, b);
+            b[i] /= *diag_ptr[i];
+        }
+    }
+}
+
 real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
                           vector_const_view b, real_t w, real_t tol,
                           uint_t max_iter, uint_t check_interval)
@@ -134,6 +218,79 @@ real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
             compute_xm(xm, x, V, ym.sub(0, m));
             copy(res, b);
             spblas_matrix_vector(-1.0, A, xm, 1.0, res);
+            prec = abs_max_val(res);
+            if (prec < tol || near_zero(H(j + 1, j), tol))
+            {
+                break;
+            }
+        }
+        if (j < kdim - 1)
+        {
+            scale(wj, 1.0 / H(j + 1, j));
+            V.push_back(wj);
+        }
+    }
+    copy(x, xm);
+    return prec;
+}
+
+// solve Ax = b, A must be full rank.
+real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
+                         vector_const_view b,
+                         size_t kdim,  // dim of krylov space
+                         real_t tol, uint_t check_interval,
+                         pre_condition Msolve)
+{
+    assert(A.m() == A.n());
+    if (kdim > A.n())
+    {
+        kdim = A.n();
+    }
+    size_t M = A.m();
+    std::vector<vector> V;
+    V.reserve(kdim);
+    matrix H(kdim + 1, kdim);
+    // step 1a: V.col(0) = M^-1 (b - A * x)
+    V.push_back(vector(b));
+    spblas_matrix_vector(-1.0, A, x, 1.0, V[0]);
+    Msolve(V[0]);
+
+    real_t beta = norm2(V[0]);
+    scale(V[0], 1.0 / beta);
+    vector wj(M);
+    vector y(kdim + 1, 0.0);
+    vector xm(x.dim());
+    vector res(x.dim());
+    real_t prec = 0;
+    uint_t check_counter = 0;
+    for (size_t j = 0; j < kdim; j++)
+    {
+        // wj = M^-1 A * V[j]
+        dot(wj, A, V[j]);
+        Msolve(wj);
+        for (size_t i = 0; i <= j; i++)
+        {
+            H(i, j) = dot(wj, V[i]);
+            // wj = wj - H(i, j) * v_i
+            blas_axpy(-H(i, j), V[i], wj);
+        }
+        H(j + 1, j) = norm2(wj);
+
+        check_counter += 1;
+        if ((check_counter % check_interval == 0) || (j == kdim - 1))
+        {
+            check_counter = 0;
+            size_t m = j + 1;
+            vector_mutable_view ym = y.sub(0, m + 1);
+            fill(ym, 0);
+            ym[0] = beta;
+            auto Hm = matrix(H.sub(0, 0, m + 1, m));
+            least_square_qr(Hm, ym);
+            compute_xm(xm, x, V, ym.sub(0, m));
+            copy(res, b);
+            // res = M^-1(b - A xm)
+            spblas_matrix_vector(-1.0, A, xm, 1.0, res);
+            Msolve(res);
             prec = abs_max_val(res);
             if (prec < tol || near_zero(H(j + 1, j), tol))
             {
