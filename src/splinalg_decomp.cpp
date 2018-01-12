@@ -37,8 +37,8 @@ void spdecomp_ilu(spmatrix_mutable_view A)
             size_t idx = row.idx[j];
             real_t ratio = row.val[j] / (*diag_ptr[idx]);
             row.val[j] = ratio;
-            spblas_zero_fillin_axpy(-ratio, A[idx].sub(idx + 1),
-                                    row.sub(idx + 1));
+            spblas_zero_fillin_axpy(-ratio, A[idx].masked(idx + 1),
+                                    row.masked(idx + 1));
         }
         if (*diag_ptr[i] == 0.0)
         {

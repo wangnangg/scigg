@@ -14,7 +14,7 @@ struct spvec_mutable_view
         : nnz(nnz), idx(idx), val(val)
     {
     }
-    spvec_mutable_view sub(size_t start);
+    spvec_mutable_view masked(size_t start);
 };
 
 struct spvec_const_view
@@ -26,7 +26,7 @@ struct spvec_const_view
         : nnz(nnz), idx(idx), val(val)
     {
     }
-    spvec_const_view sub(size_t start);
+    spvec_const_view masked(size_t start);
     spvec_const_view(const spvec_mutable_view& view)
         : nnz(view.nnz), idx(view.idx), val(view.val)
     {

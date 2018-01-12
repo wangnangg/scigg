@@ -2,7 +2,7 @@
 
 namespace markovgg
 {
-spvec_const_view spvec_const_view::sub(size_t start)
+spvec_const_view spvec_const_view::masked(size_t start)
 {
     size_t counter = nnz;
     for (size_t i = 0; i < nnz; i++)
@@ -19,7 +19,7 @@ spvec_const_view spvec_const_view::sub(size_t start)
     return spvec_const_view(counter, idx + nnz - counter, val + nnz - counter);
 }
 
-spvec_mutable_view spvec_mutable_view::sub(size_t start)
+spvec_mutable_view spvec_mutable_view::masked(size_t start)
 {
     size_t counter = nnz;
     for (size_t i = 0; i < nnz; i++)
