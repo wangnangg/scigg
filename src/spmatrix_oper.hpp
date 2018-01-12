@@ -30,5 +30,21 @@ inline vector dot(spmatrix_const_view A, vector_const_view x)
     return y;
 }
 
+real_t dot(spvec_const_view x, vector_const_view y);
+real_t dot(spvec_const_view x, spvec_const_view y);
+inline real_t dot(vector_const_view x, spvec_const_view y) { return dot(y, x); }
+inline real_t operator*(spvec_const_view x, vector_const_view y)
+{
+    return dot(x, y);
+}
+inline real_t operator*(vector_const_view x, spvec_const_view y)
+{
+    return dot(y, x);
+}
+inline real_t operator*(spvec_const_view x, spvec_const_view y)
+{
+    return dot(x, y);
+}
+
 matrix spmatrix2dense(spmatrix_const_view A);
 }

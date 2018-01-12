@@ -58,4 +58,16 @@ matrix spmatrix2dense(spmatrix_const_view A)
     }
     return M;
 }
+
+real_t dot(spvec_const_view x, vector_const_view y)
+{
+    real_t prod = 0.0;
+    for (size_t i = 0; i < x.nnz; i++)
+    {
+        size_t idx = x.idx[i];
+        real_t val = x.val[i];
+        prod += y[idx] * val;
+    }
+    return prod;
+}
 }
