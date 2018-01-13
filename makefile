@@ -35,7 +35,7 @@ utest_exe:=${test_build_dir}/utest
 example_build_dir:=${build_dir}/example
 example_exe:=${example_build_dir}/example
 
-lib_file:=${build_dir}/libmarkovgg.a
+lib_file:=${build_dir}/libscigg.a
 
 cpp_files:=${wildcard ${src_dir}/*.cpp}
 obj_files:=${addprefix ${build_dir}/,${notdir ${cpp_files:.cpp=.o}}}
