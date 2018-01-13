@@ -128,7 +128,7 @@ TEST(test_splinalg, gmres_method)
                                },
                                false);
     auto pi = create_vector(4.0, {1.0, 0, 0, 0});
-    scale(pi, -1.0);
+    scale(-1.0, pi);
     auto tau = vector(4, 0.0);
     spsolve_gmres_gms(QTT.transpose(), tau, pi, 4, 1e-6, 4);
 
@@ -150,7 +150,7 @@ TEST(test_splinalg, restart_gmres_method)
                                },
                                false);
     auto pi = create_vector(4.0, {1.0, 0, 0, 0});
-    scale(pi, -1.0);
+    scale(-1.0, pi);
     auto tau = vector(4, 0.0);
     real_t prec =
         spsolve_restart_gmres_gms(QTT.transpose(), tau, pi, 2, tol, 100, 2);
@@ -450,7 +450,7 @@ TEST(test_splinalg, precond_gmres_method)
                                },
                                false);
     auto pi = create_vector(4.0, {1.0, 0, 0, 0});
-    scale(pi, -1.0);
+    scale(-1.0, pi);
     auto tau = vector(4, 0.0);
     auto iLU = spmatrix(QTT.transpose());
     spdecomp_ilu(iLU);

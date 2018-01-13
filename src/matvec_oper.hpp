@@ -29,27 +29,27 @@ bool near_zero(const vector& v1, real_t tol);
 bool near_eq(vector_const_view v1, vector_const_view v2, real_t tol);
 bool near_eq(matrix_const_view M1, matrix_const_view M2, real_t tol);
 
-void fill(vector_mutable_view x, real_t val);
-void fill(matrix_mutable_view A, real_t val);
+void fill(real_t val, vector_mutable_view x);
+void fill(real_t val, matrix_mutable_view A);
 
 // y = x
-void copy(vector_mutable_view y, vector_const_view x);
-void copy(matrix_mutable_view Y, matrix_const_view X);
+void copy(vector_const_view x, vector_mutable_view y);
+void copy(matrix_const_view X, matrix_mutable_view Y);
 
-inline void scale(vector_mutable_view x, real_t alpha) { blas_scale(alpha, x); }
+inline void scale(real_t alpha, vector_mutable_view x) { blas_scale(alpha, x); }
 inline vector_mutable_view operator*=(vector_mutable_view x, real_t alpha)
 {
-    scale(x, alpha);
+    scale(alpha, x);
     return x;
 }
 
 vector operator*(real_t alpha, vector_const_view x);
 inline vector operator*(vector_const_view x, real_t alpha) { return alpha * x; }
 
-void scale(matrix_mutable_view A, real_t alpha);
+void scale(real_t alpha, matrix_mutable_view A);
 inline matrix_mutable_view operator*=(matrix_mutable_view A, real_t alpha)
 {
-    scale(A, alpha);
+    scale(alpha, A);
     return A;
 }
 
@@ -60,23 +60,23 @@ inline real_t norm1(vector_const_view vec) { return blas_abs_sum(vec); }
 
 inline real_t norm2(vector_const_view vec) { return blas_norm2(vec); }
 
-inline void set_norm1(vector_mutable_view vec, real_t val)
+inline void set_norm1(real_t val, vector_mutable_view vec)
 {
     real_t n1 = norm1(vec);
-    scale(vec, val / n1);
+    scale(val / n1, vec);
 }
-inline void set_norm2(vector_mutable_view vec, real_t val)
+inline void set_norm2(real_t val, vector_mutable_view vec)
 {
     real_t n2 = norm2(vec);
-    scale(vec, val / n2);
+    scale(val / n2, vec);
 }
 
 // add z = x + y
-void add(vector_mutable_view z, vector_const_view x, vector_const_view y);
+void add(vector_const_view x, vector_const_view y, vector_mutable_view z);
 inline vector add(vector_const_view x, vector_const_view y)
 {
     vector z(x.dim());
-    add(z, x, y);
+    add(x, y, z);
     return z;
 }
 inline vector operator+(vector_const_view x, vector_const_view y)
@@ -85,20 +85,20 @@ inline vector operator+(vector_const_view x, vector_const_view y)
 }
 
 // inc z += x
-void inc(vector_mutable_view z, vector_const_view x);
+void inc(vector_const_view x, vector_mutable_view z);
 inline vector_mutable_view operator+=(vector_mutable_view z,
                                       vector_const_view x)
 {
-    inc(z, x);
+    inc(x, z);
     return z;
 }
 
 // add z = x - y
-void sub(vector_mutable_view z, vector_const_view x, vector_const_view y);
+void sub(vector_const_view x, vector_const_view y, vector_mutable_view z);
 inline vector sub(vector_const_view x, vector_const_view y)
 {
     vector z(x.dim());
-    sub(z, x, y);
+    sub(x, y, z);
     return z;
 }
 inline vector operator-(vector_const_view x, vector_const_view y)
@@ -107,11 +107,11 @@ inline vector operator-(vector_const_view x, vector_const_view y)
 }
 
 // z -= x
-void dec(vector_mutable_view z, vector_const_view x);
+void dec(vector_const_view x, vector_mutable_view z);
 inline vector_mutable_view operator-=(vector_mutable_view z,
                                       vector_const_view x)
 {
-    dec(z, x);
+    dec(x, z);
     return z;
 }
 
@@ -123,11 +123,11 @@ inline real_t operator*(vector_const_view x, vector_const_view y)
 }
 
 // dot z = A . x
-void dot(vector_mutable_view z, matrix_const_view A, vector_const_view x);
+void dot(matrix_const_view A, vector_const_view x, vector_mutable_view z);
 inline vector dot(matrix_const_view A, vector_const_view x)
 {
     vector z(A.m());
-    dot(z, A, x);
+    dot(A, x, z);
     return z;
 }
 inline vector operator*(matrix_const_view A, vector_const_view x)
@@ -140,11 +140,11 @@ inline vector operator*(vector_const_view x, matrix_const_view A)
 }
 
 // dot C = A . B
-void dot(matrix_mutable_view C, matrix_const_view A, matrix_const_view B);
+void dot(matrix_const_view A, matrix_const_view B, matrix_mutable_view C);
 inline matrix dot(matrix_const_view A, matrix_const_view B)
 {
     matrix C(A.m(), B.n());
-    dot(C, A, B);
+    dot(A, B, C);
     return C;
 }
 inline matrix operator*(matrix_const_view A, matrix_const_view B)

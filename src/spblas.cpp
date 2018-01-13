@@ -45,7 +45,7 @@ void spblas_matrix_vector(real_t alpha, spmatrix_const_view A,
 {
     assert(A.n() == x.dim());
     assert(A.m() == y.dim());
-    scale(y, beta);
+    scale(beta, y);
     if (A.is_compressed_row())
     {
         for (size_t i = 0; i < y.dim(); i++)

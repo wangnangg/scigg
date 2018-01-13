@@ -24,7 +24,7 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
     do
     {
         // x1 = alpha * p + x0
-        copy(x1, x0);
+        copy(x0, x1);
         blas_axpy(alpha, p, x1);
         obj(y1, grad1, x1);
         real_t deval = dot(grad0, p);
@@ -89,9 +89,9 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
     blas_axpy(-first_step_len / grad_norm, grad0, x1);
     obj(y1, grad1, x1);
     matrix H = identity_matrix(N);
-    sub(dx, x1, x0);
-    sub(dg, grad1, grad0);
-    scale(H, dot(dg, dx) / dot(dg, dg));
+    sub(x1, x0, dx);
+    sub(grad1, grad0, dg);
+    scale(dot(dg, dx) / dot(dg, dg), H);
     // start iteration
     for (size_t i = 0; i < max_iter; i++)
     {
@@ -107,10 +107,10 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
         {
             break;
         }
-        sub(dx, x1, x0);
-        sub(dg, grad1, grad0);
+        sub(x1, x0, dx);
+        sub(grad1, grad0, dg);
     }
-    copy(x, x1);
+    copy(x1, x);
     y = y1;
     return grad_norm;
 }

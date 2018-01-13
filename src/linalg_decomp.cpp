@@ -15,7 +15,7 @@ void decomp_qr_mgs(matrix_mutable_view A, matrix_mutable_view R)
     {
         auto qi = A.col(i);
         real_t rii = norm2(qi);
-        scale(qi, 1.0 / rii);
+        scale(1.0 / rii, qi);
         R(i, i) = rii;
         for (size_t j = i + 1; j < A.n(); j++)
         {
@@ -38,7 +38,7 @@ real_t find_householder_vector(vector_mutable_view w)
         wr = -wr;
     }
     w[0] += wr;
-    scale(w, 1.0 / w[0]);
+    scale(1.0 / w[0], w);
     real_t vnorm = norm2(w);
     real_t tau = 2.0 / (vnorm * vnorm);
     w[0] = -wr;
@@ -98,7 +98,7 @@ void unpack_qr(matrix_const_view QR, vector_const_view tau_vec,
     assert(R.m() == QR.n());
     assert(QR.n() == tau_vec.dim());
     size_t n = QR.n();
-    fill(Q, 0.0);
+    fill(0.0, Q);
     for (size_t i = 0; i < Q.n(); i++)
     {
         Q(i, i) = 1.0;

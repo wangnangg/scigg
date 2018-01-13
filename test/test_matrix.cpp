@@ -60,7 +60,7 @@ TEST(test_matrix, submatrix)
                                       7, 2, 9,  //
                                       7, 2, 9,  //
                                   });
-        copy(A_.col(2).sub(2), create_vector(2, {8, 8}));
+        copy(create_vector(2, {8, 8}), A_.col(2).sub(2));
         ASSERT_EQ(A_.col(2), create_vector(4, {3, 1, 8, 8}));
     }
 }

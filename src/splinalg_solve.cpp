@@ -186,7 +186,7 @@ real_t spsolve_sor_method(spmatrix_const_view A, vector_mutable_view x,
             }
             std::swap(x_next, x);
         }
-        copy(res, b);
+        copy(b, res);
         spblas_matrix_vector(-1.0, A, x, 1.0, res);
         prec = abs_max_val(res);
         if (prec < tol)
@@ -203,7 +203,7 @@ void compute_xm(vector_mutable_view xm, vector_const_view x0,
     assert(xm.dim() == x0.dim());
     assert(xm.dim() == Vm[0].dim());
     assert(Vm.size() == ym.dim());
-    copy(xm, x0);
+    copy(x0, xm);
     for (size_t i = 0; i < ym.dim(); i++)
     {
         blas_axpy(ym[i], Vm[i], xm);
@@ -235,7 +235,7 @@ real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
     }
 
     real_t beta = norm2(V[0]);
-    scale(V[0], 1.0 / beta);
+    scale(1.0 / beta, V[0]);
     vector wj(M);
     vector y(kdim + 1, 0.0);
     vector xm(x.dim());
@@ -264,12 +264,12 @@ real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
             check_counter = 0;
             size_t m = j + 1;
             vector_mutable_view ym = y.sub(0, m + 1);
-            fill(ym, 0);
+            fill(0, ym);
             ym[0] = beta;
             auto Hm = matrix(H.sub(0, 0, m + 1, m));
             least_square_qr(Hm, ym);
             compute_xm(xm, x, V, ym.sub(0, m));
-            copy(res, b);
+            copy(b, res);
             // res = (b - A xm), no precondition for res
             spblas_matrix_vector(-1.0, A, xm, 1.0, res);
             prec = abs_max_val(res);
@@ -280,11 +280,11 @@ real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
         }
         if (j < kdim - 1)
         {
-            scale(wj, 1.0 / H(j + 1, j));
+            scale(1.0 / H(j + 1, j), wj);
             V.push_back(wj);
         }
     }
-    copy(x, xm);
+    copy(xm, x);
     return prec;
 }
 

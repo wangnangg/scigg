@@ -47,7 +47,7 @@ bool near_eq(matrix_const_view M1, matrix_const_view M2, real_t tol)
     return true;
 }
 
-void fill(vector_mutable_view x, real_t val)
+void fill(real_t val, vector_mutable_view x)
 {
     for (size_t i = 0; i < x.dim(); i++)
     {
@@ -55,8 +55,8 @@ void fill(vector_mutable_view x, real_t val)
     }
 }
 
-void copy(vector_mutable_view y, vector_const_view x) { blas_copy(x, y); }
-void copy(matrix_mutable_view Y, matrix_const_view X)
+void copy(vector_const_view x, vector_mutable_view y) { blas_copy(x, y); }
+void copy(matrix_const_view X, matrix_mutable_view Y)
 {
     assert(Y.m() == X.m());
     assert(Y.n() == X.n());
@@ -69,7 +69,7 @@ void copy(matrix_mutable_view Y, matrix_const_view X)
     }
 }
 
-void fill(matrix_mutable_view A, real_t val)
+void fill(real_t val, matrix_mutable_view A)
 {
     for (size_t i = 0; i < A.m(); i++)
     {
@@ -87,7 +87,7 @@ vector operator*(real_t alpha, vector_const_view x)
     return y;
 }
 
-void scale(matrix_mutable_view A, real_t alpha)
+void scale(real_t alpha, matrix_mutable_view A)
 {
     for (size_t i = 0; i < A.m(); i++)
     {
@@ -110,7 +110,7 @@ matrix operator*(real_t alpha, matrix_const_view A)
     }
     return B;
 }
-void add(vector_mutable_view z, vector_const_view x, vector_const_view y)
+void add(vector_const_view x, vector_const_view y, vector_mutable_view z)
 {
     assert(z.dim() == x.dim());
     assert(z.dim() == y.dim());
@@ -120,13 +120,13 @@ void add(vector_mutable_view z, vector_const_view x, vector_const_view y)
     }
 }
 
-void inc(vector_mutable_view z, vector_const_view x)
+void inc(vector_const_view x, vector_mutable_view z)
 {
     // z = x + z
     blas_axpy(1.0, x, z);
 }
 
-void sub(vector_mutable_view z, vector_const_view x, vector_const_view y)
+void sub(vector_const_view x, vector_const_view y, vector_mutable_view z)
 {
     assert(z.dim() == x.dim());
     assert(z.dim() == y.dim());
@@ -136,19 +136,19 @@ void sub(vector_mutable_view z, vector_const_view x, vector_const_view y)
     }
 }
 
-void dec(vector_mutable_view z, vector_const_view x)
+void dec(vector_const_view x, vector_mutable_view z)
 {
     // z = - x + z
     blas_axpy(-1.0, x, z);
 }
 real_t dot(vector_const_view x, vector_const_view y) { return blas_dot(x, y); }
 
-void dot(vector_mutable_view z, matrix_const_view A, vector_const_view x)
+void dot(matrix_const_view A, vector_const_view x, vector_mutable_view z)
 {
     blas_matrix_vector(1.0, A, x, 0.0, z);
 }
 // C = A * B
-void dot(matrix_mutable_view C, matrix_const_view A, matrix_const_view B)
+void dot(matrix_const_view A, matrix_const_view B, matrix_mutable_view C)
 {
     blas_matrix_matrix(1.0, A, B, 0.0, C);
 }
