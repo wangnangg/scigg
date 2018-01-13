@@ -5,26 +5,27 @@ gtest_dir:=${curr_dir}/googletest/googletest
 src_dir:=${curr_dir}/src
 test_dir:=${curr_dir}/test
 example_dir:=${curr_dir}/example
+build_base?=${curr_dir}/build
 flags = -I${src_dir} -std=c++1z -Wall -Wfloat-conversion -Wsign-conversion -Werror -MMD
 link_flags =-lstdc++ -lm -pthread -lblas
 ifeq ($(release), 1)
 	flags += -O3 -DNDEBUG
 	link_flags += -O3 -DNDEBUG
-	build_dir:=${curr_dir}/build/release
+	build_dir:=${build_base}/release
 else
   ifeq ($(profile), 1)
 	  flags += -g -O3 -pg -no-pie
 	  link_flags += -g -O3 -no-pie
-	  build_dir:=${curr_dir}/build/profile
+	  build_dir:=${build_base}/profile
   else
     ifeq ($(coverage), 1)
       flags += -g -ftest-coverage -fprofile-arcs
 	  link_flags += -g -fprofile-arcs
-	  build_dir:=${curr_dir}/build/coverage
+	  build_dir:=${build_base}/coverage
     else
 	  flags += -g
 	  link_flags += -g
-	  build_dir:=${curr_dir}/build/debug
+	  build_dir:=${build_base}/debug
     endif
   endif
 endif
@@ -34,6 +35,7 @@ utest_exe:=${test_build_dir}/utest
 example_build_dir:=${build_dir}/example
 example_exe:=${example_build_dir}/example
 
+lib_file:=${build_dir}/libmarkovgg.a
 
 cpp_files:=${wildcard ${src_dir}/*.cpp}
 obj_files:=${addprefix ${build_dir}/,${notdir ${cpp_files:.cpp=.o}}}
@@ -51,12 +53,17 @@ gtest_obj:=${test_build_dir}/gtest-all.o
 gtest_flags:=-isystem ${gtest_dir}/include -I${gtest_dir}
 
 
-.PHONY: run_utest example
+.PHONY: run_utest example lib
 run_utest: ${utest_exe}
 	${utest_exe} ${args}
 
 example: ${example_exe}
 	${example_exe} ${args}
+
+lib: ${lib_file}
+
+${lib_file}: ${obj_files}
+	ar crf $@ $^
 
 ${utest_exe}: ${obj_files} ${test_obj_files} ${gtest_obj}
 	${cc_compiler} $^ ${link_flags} -o $@
@@ -75,6 +82,10 @@ ${test_build_dir}:
 
 ${example_build_dir}:
 	mkdir -p $@
+
+${lib_build_dir}:
+	mkdir -p $@
+
 
 .PHONY: clean
 clean:
