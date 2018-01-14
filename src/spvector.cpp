@@ -1,6 +1,6 @@
 #include "spvector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 spvec_const_view spvec_const_view::masked(size_t start)
 {

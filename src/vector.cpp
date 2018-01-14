@@ -1,6 +1,6 @@
 #include "vector.hpp"
 #include "blas.hpp"
-namespace markovgg
+namespace scigg
 {
 vector_mutable_view::vector_mutable_view(vector &v)
     : vector_mutable_view(&v[0], v.dim(), v.inc())

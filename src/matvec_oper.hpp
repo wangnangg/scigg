@@ -3,7 +3,7 @@
 #include "matrix.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 inline real_t abs(real_t v) { return v >= 0 ? v : -v; }
 inline real_t max(real_t x, real_t y) { return x > y ? x : y; }

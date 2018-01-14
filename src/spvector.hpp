@@ -3,7 +3,7 @@
 #include <vector>
 #include "type.hpp"
 
-namespace markovgg
+namespace scigg
 {
 struct spvec_mutable_view
 {

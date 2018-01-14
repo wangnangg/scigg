@@ -4,7 +4,7 @@
 #include "linalg.hpp"
 #include "matvec_oper.hpp"
 
-namespace markovgg
+namespace scigg
 {
 void decomp_qr_mgs(matrix_mutable_view A, matrix_mutable_view R)
 {

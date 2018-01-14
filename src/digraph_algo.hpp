@@ -2,7 +2,7 @@
 #include <vector>
 #include "spmatrix.hpp"
 
-namespace markovgg
+namespace scigg
 {
 struct scc_component
 {

@@ -1,7 +1,7 @@
 #include "blas.hpp"
 #include <utility>
 
-namespace markovgg
+namespace scigg
 {
 // level 1 blas
 

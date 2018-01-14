@@ -4,7 +4,7 @@
 #include "linalg.hpp"
 #include "matvec_oper.hpp"
 
-namespace markovgg
+namespace scigg
 {
 // A * x = b
 void least_square_qr(matrix_mutable_view A, vector_mutable_view b)

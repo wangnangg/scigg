@@ -3,7 +3,7 @@
 #include "spmatrix.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 // y = ax + y
 void spblas_zero_fillin_axpy(real_t alpha, spvec_const_view x,

@@ -1,6 +1,6 @@
 #pragma once
 #include "matrix.hpp"
-namespace markovgg
+namespace scigg
 {
 // find vector v, with v[0] = 1, so that (I - tau v v') w zeros w[1:n]. v[1:n]
 // is stored in w[1:n] and w[0] = (Px)[0]

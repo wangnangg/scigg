@@ -6,7 +6,7 @@
 extern "C" {
 #include "cblas.h"
 }
-namespace markovgg
+namespace scigg
 {
 // level 1 blas
 

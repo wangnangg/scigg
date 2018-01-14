@@ -4,7 +4,7 @@
 #include "type.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 class matrix_base
 {

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <utility>
 #include "debug_utils.hpp"
-namespace markovgg
+namespace scigg
 {
 spmatrix_mutable_view::spmatrix_mutable_view(spmatrix& mat)
     : spmatrix_base(mat.m(), mat.n(), mat.is_compressed_row()),

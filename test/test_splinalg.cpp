@@ -5,7 +5,7 @@
 #include "linalg.hpp"
 #include "matvec_oper.hpp"
 #include "splinalg.hpp"
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 
 static real_t tol = 1e-10;
 static uint_t max_iter = 1000;

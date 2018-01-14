@@ -8,7 +8,7 @@
 #include "spmatrix.hpp"
 #include "type.hpp"
 
-using namespace markovgg;
+using namespace scigg;
 
 void print_sep();
 

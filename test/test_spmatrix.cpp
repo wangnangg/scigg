@@ -2,7 +2,7 @@
 #include "debug_utils.hpp"
 #include "gtest/gtest.h"
 #include "spmatrix.hpp"
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 
 TEST(test_spmatrix, create)
 {

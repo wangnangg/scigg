@@ -7,7 +7,7 @@
 #include "matrix.hpp"
 #include "spmatrix.hpp"
 #include "vector.hpp"
-namespace markovgg
+namespace scigg
 {
 std::ostream& operator<<(std::ostream& os, const matrix& mat);
 std::ostream& operator<<(std::ostream& os, const matrix_mutable_view& mat);

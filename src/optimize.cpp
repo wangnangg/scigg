@@ -3,7 +3,7 @@
 #include "debug_utils.hpp"
 #include "matrix.hpp"
 #include "matvec_oper.hpp"
-namespace markovgg
+namespace scigg
 {
 // on input:
 //  x contains current solution

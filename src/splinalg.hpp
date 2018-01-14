@@ -7,7 +7,7 @@
 #include "matrix.hpp"
 #include "type.hpp"
 
-namespace markovgg
+namespace scigg
 {
 // implicit form of M^-1 solve for M x = b, x will be stored in b
 typedef std::function<void(vector_mutable_view b)> pre_condition;

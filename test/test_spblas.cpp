@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "matvec_oper.hpp"
 #include "spblas.hpp"
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 
 TEST(test_spblas, level2_crs)
 {

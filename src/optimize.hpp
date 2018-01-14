@@ -3,7 +3,7 @@
 #include "type.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 // y, grad = f(x), f'(x)
 typedef std::function<void(real_t& y, vector_mutable_view grad,

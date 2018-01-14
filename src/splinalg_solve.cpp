@@ -5,10 +5,10 @@
 #include "matvec_oper.hpp"
 #include "spblas.hpp"
 #include "splinalg.hpp"
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 real_t abs_max_val(vector_const_view v)
 {
@@ -245,7 +245,7 @@ real_t spsolve_gmres_gms(spmatrix_const_view A, vector_mutable_view x,
     for (size_t j = 0; j < kdim; j++)
     {
         // wj = M^-1 A * V[j]
-        dot(wj, A, V[j]);
+        dot(A, V[j], wj);
         if (Msolve)
         {
             Msolve(wj);

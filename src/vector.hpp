@@ -2,7 +2,7 @@
 #include <cassert>
 #include <vector>
 #include "type.hpp"
-namespace markovgg
+namespace scigg
 {
 class vector_base
 {

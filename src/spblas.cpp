@@ -1,6 +1,6 @@
 #include "spblas.hpp"
 #include "matvec_oper.hpp"
-namespace markovgg
+namespace scigg
 {
 void spblas_zero_fillin_axpy(real_t alpha, spvec_const_view x,
                              spvec_mutable_view y)

@@ -1,6 +1,6 @@
 #include "debug_utils.hpp"
 #include "matrix.hpp"
-namespace markovgg
+namespace scigg
 {
 std::ostream& operator<<(std::ostream& os, const matrix_const_view& mat)
 {

@@ -5,9 +5,9 @@
 #include "linalg.hpp"
 #include "matvec_oper.hpp"
 #include "spblas.hpp"
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 }

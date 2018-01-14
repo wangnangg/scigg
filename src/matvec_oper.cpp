@@ -1,6 +1,6 @@
 #include "matvec_oper.hpp"
 #include "blas.hpp"
-namespace markovgg
+namespace scigg
 {
 bool near_zero(vector_const_view v1, real_t tol)
 {

@@ -5,10 +5,10 @@
 #include "matvec_oper.hpp"
 #include "spblas.hpp"
 #include "splinalg.hpp"
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 void spdecomp_ilu(spmatrix_mutable_view A)
 {

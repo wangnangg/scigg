@@ -1,5 +1,5 @@
 #include "digraph_algo.hpp"
-namespace markovgg
+namespace scigg
 {
 struct scc_node
 {

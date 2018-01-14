@@ -4,7 +4,7 @@
 #include <sstream>
 #include "matrix.hpp"
 
-using namespace markovgg;
+using namespace scigg;
 
 void print_sep() { std::cout << "-------------------" << std::endl; }
 

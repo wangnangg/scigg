@@ -3,7 +3,7 @@
 #include <vector>
 #include "spvector.hpp"
 #include "type.hpp"
-namespace markovgg
+namespace scigg
 {
 class spmatrix_base
 {

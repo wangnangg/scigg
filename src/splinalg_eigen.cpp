@@ -5,10 +5,10 @@
 #include "matvec_oper.hpp"
 #include "spblas.hpp"
 #include "splinalg.hpp"
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 #include "vector.hpp"
 
-namespace markovgg
+namespace scigg
 {
 real_t max_diff(vector_const_view v1, vector_const_view v2)
 {
@@ -36,7 +36,7 @@ real_t eigen_power_method(spmatrix_const_view A, vector_mutable_view x,
     {
         for (uint_t jj = 0; jj < check_interval; jj++)
         {
-            dot(x_next, A, x);
+            dot(A, x, x_next);
             set_norm1(1.0, x_next);
             std::swap(x_next, x);
         }

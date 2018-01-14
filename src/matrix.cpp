@@ -1,6 +1,6 @@
 #include "matrix.hpp"
 
-namespace markovgg
+namespace scigg
 {
 matrix_mutable_view::matrix_mutable_view(matrix& M)
     : matrix_mutable_view(&M(0, 0), M.m(), M.n(), M.ldim(), M.is_col_major())

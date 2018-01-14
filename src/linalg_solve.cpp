@@ -4,7 +4,7 @@
 #include "linalg.hpp"
 #include "matvec_oper.hpp"
 
-namespace markovgg
+namespace scigg
 {
 // solve L x = b, b will be replaced with solution
 void solve_lower_tri(matrix_const_view L, vector_mutable_view b)

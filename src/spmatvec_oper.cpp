@@ -1,6 +1,6 @@
-#include "spmatrix_oper.hpp"
+#include "spmatvec_oper.hpp"
 #include "spblas.hpp"
-namespace markovgg
+namespace scigg
 {
 spmatrix create_spmatrix(size_t m, size_t n, const std::vector<double>& v,
                          bool is_row_compressed)
@@ -21,7 +21,7 @@ spmatrix create_spmatrix(size_t m, size_t n, const std::vector<double>& v,
     return M.create(is_row_compressed);
 }
 
-void dot(vector_mutable_view y, spmatrix_const_view A, vector_const_view x)
+void dot(spmatrix_const_view A, vector_const_view x, vector_mutable_view y)
 {
     // y = alpha * A * x + beta * y
     spblas_matrix_vector(1.0, A, x, 0.0, y);

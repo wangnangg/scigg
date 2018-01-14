@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <exception>
 #include <string>
-namespace markovgg
+namespace scigg
 {
 using std::size_t;
 typedef double real_t;
