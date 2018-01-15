@@ -1,4 +1,4 @@
-1. slice vs sub
+1. slice vs sub ... done
 2. spmatrix add
 3. solve_qr/lu should be supplied with decomposed matrices.
 4. iLU with partial pivoting
