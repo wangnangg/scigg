@@ -18,7 +18,7 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
                        vector_const_view x0, real_t y0,
                        vector_const_view grad0,  //
                        vector_mutable_view x1, real_t& y1,
-                       vector_mutable_view grad1)
+                       vector_mutable_view grad1, real_t tol)
 {
     real_t step_upper_bound = 0.0;
     do
@@ -27,6 +27,11 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
         copy(x0, x1);
         blas_axpy(alpha, p, x1);
         obj(y1, grad1, x1);
+        if (norm2(grad1) < tol)
+        {
+            // exit condition satisfied
+            break;
+        }
         real_t deval = dot(grad0, p);
         if (y1 > y0 + c1 * alpha * deval)  // descent is not enough, shrink step
         {
@@ -101,7 +106,8 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
         std::swap(x0, x1);
         std::swap(grad0, grad1);
         std::swap(y0, y1);
-        line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grad1);
+        line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grad1,
+                          tol);
         grad_norm = norm2(grad1);
         if (grad_norm <= tol)
         {
