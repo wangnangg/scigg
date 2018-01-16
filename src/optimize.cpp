@@ -21,6 +21,9 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
                        vector_mutable_view grad1, real_t tol)
 {
     real_t step_upper_bound = 0.0;
+    real_t deval = dot(grad0, p);
+    real_t descent = c1 * deval;
+    real_t curvature = c2 * deval;
     do
     {
         // x1 = alpha * p + x0
@@ -32,14 +35,13 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
             // exit condition satisfied
             break;
         }
-        real_t deval = dot(grad0, p);
-        if (y1 > y0 + c1 * alpha * deval)  // descent is not enough, shrink step
+        if (y1 > y0 + alpha * descent)  // descent is not enough, shrink step
         {
             step_upper_bound = alpha;
             alpha /= 2.0;
         }
         else if (dot(grad1, p) <
-                 c2 * deval)  // curvature not large enough, increase step
+                 curvature)  // curvature not large enough, increase step
         {
             if (step_upper_bound == 0.0)  // haven't found the upper bound
             {
@@ -81,18 +83,19 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
     vector grad0(N);
     vector grad1(N);
     auto x0 = vector(x);
+    vector x1(x.dim());
     real_t y0;
     real_t y1;
-    vector p(N);
+    vector p(N, 0.0);
     vector dx(N);
     vector dg(N);
+    real_t alpha;
 
-    // bootstrap
+    // bootstrap matrix H
     obj(y0, grad0, x0);
-    real_t grad_norm = norm2(grad0);
-    vector x1 = x0;
-    blas_axpy(-first_step_len / grad_norm, grad0, x1);
-    obj(y1, grad1, x1);
+    alpha = first_step_len;
+    blas_axpy(-1.0 / norm2(grad0), grad0, p);
+    line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grad1, tol);
     matrix H = identity_matrix(N);
     sub(x1, x0, dx);
     sub(grad1, grad0, dg);
@@ -101,15 +104,16 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
     for (size_t i = 0; i < max_iter; i++)
     {
         update_hmatrix(H, dx, dg);
+        // p = - H * grad
         blas_matrix_vector(-1.0, H, grad1, 0.0, p);
-        real_t alpha = 1.0;
+        assert(grad1 * p < 0);
         std::swap(x0, x1);
         std::swap(grad0, grad1);
         std::swap(y0, y1);
+        alpha = 1.0;
         line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grad1,
                           tol);
-        grad_norm = norm2(grad1);
-        if (grad_norm <= tol)
+        if (norm2(grad1) <= tol)
         {
             break;
         }
@@ -118,6 +122,6 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
     }
     copy(x1, x);
     y = y1;
-    return grad_norm;
+    return norm2(grad1);
 }
 }
