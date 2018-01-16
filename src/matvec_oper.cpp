@@ -120,6 +120,21 @@ void add(vector_const_view x, vector_const_view y, vector_mutable_view z)
     }
 }
 
+void add(matrix_const_view x, matrix_const_view y, matrix_mutable_view z)
+{
+    assert(x.m() == y.m());
+    assert(x.m() == z.m());
+    assert(x.n() == y.n());
+    assert(x.n() == z.n());
+    for (size_t i = 0; i < x.m(); i++)
+    {
+        for (size_t j = 0; j < x.n(); j++)
+        {
+            z(i, j) = x(i, j) + y(i, j);
+        }
+    }
+}
+
 void inc(vector_const_view x, vector_mutable_view z)
 {
     // z = x + z
