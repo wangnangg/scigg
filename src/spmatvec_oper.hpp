@@ -46,5 +46,13 @@ inline real_t operator*(spvec_const_view x, spvec_const_view y)
     return dot(x, y);
 }
 
+// C = A + B
+spmatrix add(spmatrix_const_view A, spmatrix_const_view B);
+inline spmatrix operator+(spmatrix_const_view A, spmatrix_const_view B)
+{
+    return add(A, B);
+}
+
 matrix spmatrix2dense(spmatrix_const_view A);
+spmatrix dense2spmatrix(matrix_const_view A, real_t drop_tol);
 }

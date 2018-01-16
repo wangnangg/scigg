@@ -84,6 +84,18 @@ inline vector operator+(vector_const_view x, vector_const_view y)
     return add(x, y);
 }
 
+void add(matrix_const_view x, matrix_const_view y, matrix_mutable_view z);
+inline matrix add(matrix_const_view x, matrix_const_view y)
+{
+    auto z = matrix(x.m(), x.n());
+    add(x, y, z);
+    return z;
+}
+inline matrix operator+(matrix_const_view x, matrix_const_view y)
+{
+    return add(x, y);
+}
+
 // inc z += x
 void inc(vector_const_view x, vector_mutable_view z);
 inline vector_mutable_view operator+=(vector_mutable_view z,
