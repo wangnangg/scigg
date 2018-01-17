@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "matrix.hpp"
 
 using namespace scigg;
 

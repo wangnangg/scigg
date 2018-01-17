@@ -1,6 +1,6 @@
 #include "common.hpp"
-#include "debug_utils.hpp"
-#include "digraph_algo.hpp"
+#include "debug.hpp"
+#include "graph.hpp"
 #include "gtest/gtest.h"
 
 size_t bottom_count(const std::vector<scc_component>& scc_list)

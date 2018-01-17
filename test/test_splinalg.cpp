@@ -1,11 +1,10 @@
-#include "blas.hpp"
 #include "common.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
 #include "linalg.hpp"
-#include "matvec_oper.hpp"
+#include "matvec.hpp"
 #include "splinalg.hpp"
-#include "spmatvec_oper.hpp"
+#include "spmatvec.hpp"
 
 static real_t tol = 1e-10;
 static uint_t max_iter = 1000;

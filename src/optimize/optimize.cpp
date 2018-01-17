@@ -1,8 +1,7 @@
 #include "optimize.hpp"
 #include <cassert>
-#include "debug_utils.hpp"
-#include "matrix.hpp"
-#include "matvec_oper.hpp"
+#include "debug.hpp"
+#include "matvec.hpp"
 namespace scigg
 {
 // on input:

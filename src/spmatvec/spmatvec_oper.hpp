@@ -1,8 +1,7 @@
 #pragma once
 
-#include "matrix.hpp"
+#include "matvec.hpp"
 #include "spmatrix.hpp"
-#include "vector.hpp"
 
 namespace scigg
 {

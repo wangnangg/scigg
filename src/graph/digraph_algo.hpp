@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "spmatrix.hpp"
+#include "spmatvec.hpp"
 
 namespace scigg
 {

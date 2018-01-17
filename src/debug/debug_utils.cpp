@@ -1,5 +1,5 @@
 #include "debug_utils.hpp"
-#include "matrix.hpp"
+#include "matvec.hpp"
 namespace scigg
 {
 std::ostream& operator<<(std::ostream& os, const matrix_const_view& mat)

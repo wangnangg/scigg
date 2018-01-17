@@ -1,5 +1,5 @@
 #include "spmatvec_oper.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "spblas.hpp"
 namespace scigg
 {

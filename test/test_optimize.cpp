@@ -1,10 +1,9 @@
 #include <cmath>
-#include "blas.hpp"
 #include "common.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
 #include "linalg.hpp"
-#include "matvec_oper.hpp"
+#include "matvec.hpp"
 #include "optimize.hpp"
 
 // y = x0 * x0 + 2 * (x1 - 1) * (x1 - 1) + 5

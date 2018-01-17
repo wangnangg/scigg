@@ -1,8 +1,7 @@
 #include <cassert>
-#include "blas.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "linalg.hpp"
-#include "matvec_oper.hpp"
+#include "matvec.hpp"
 
 namespace scigg
 {

@@ -4,8 +4,8 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "matrix.hpp"
-#include "spmatrix.hpp"
+#include "matvec.hpp"
+#include "spmatvec.hpp"
 #include "type.hpp"
 
 using namespace scigg;

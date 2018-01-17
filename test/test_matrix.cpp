@@ -1,10 +1,9 @@
 #include <iostream>
 #include <vector>
 #include "common.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
-#include "matrix.hpp"
-#include "matvec_oper.hpp"
+#include "matvec.hpp"
 TEST(test_matrix, submatrix)
 {
     {

@@ -1,9 +1,9 @@
 #include <iostream>
 #include <vector>
 #include "common.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
-#include "matvec_oper.hpp"
+#include "matvec.hpp"
 
 TEST(test_matvec_oper, vector_oper)
 {

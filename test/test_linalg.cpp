@@ -1,9 +1,8 @@
-#include "blas.hpp"
 #include "common.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
 #include "linalg.hpp"
-#include "matvec_oper.hpp"
+#include "matvec.hpp"
 
 TEST(test_linalg, decomp_qr_gms1)
 {

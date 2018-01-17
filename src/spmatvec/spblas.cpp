@@ -1,5 +1,5 @@
 #include "spblas.hpp"
-#include "matvec_oper.hpp"
+#include "matvec.hpp"
 namespace scigg
 {
 void spblas_zero_fillin_axpy(real_t alpha, spvec_const_view x,

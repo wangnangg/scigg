@@ -1,6 +1,6 @@
 #include <fstream>
 #include "common.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
 TEST(test_read, read_cord_format)
 {

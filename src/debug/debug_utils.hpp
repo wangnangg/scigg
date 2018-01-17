@@ -4,9 +4,8 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
-#include "matrix.hpp"
-#include "spmatrix.hpp"
-#include "vector.hpp"
+#include "matvec.hpp"
+#include "spmatvec.hpp"
 namespace scigg
 {
 std::ostream& operator<<(std::ostream& os, const matrix& mat);

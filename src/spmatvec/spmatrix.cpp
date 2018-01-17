@@ -1,7 +1,7 @@
 #include "spmatrix.hpp"
 #include <algorithm>
 #include <utility>
-#include "debug_utils.hpp"
+#include "debug.hpp"
 namespace scigg
 {
 spmatrix_mutable_view::spmatrix_mutable_view(spmatrix& mat)

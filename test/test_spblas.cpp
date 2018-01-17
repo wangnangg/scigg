@@ -1,11 +1,10 @@
 #include <iostream>
 #include <vector>
 #include "common.hpp"
-#include "debug_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
-#include "matvec_oper.hpp"
-#include "spblas.hpp"
-#include "spmatvec_oper.hpp"
+#include "matvec.hpp"
+#include "spmatvec.hpp"
 
 TEST(test_spblas, level2_crs)
 {
