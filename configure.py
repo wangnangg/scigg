@@ -10,7 +10,7 @@ def list2makestr(objs):
     return ''.join(obj_str)
 
 
-#recursively list all files that match specified extensions
+# recursively list all files that match specified extensions
 def find_files(target_dir, exts):
     if type(exts) is str:
         exts = [exts]
@@ -42,9 +42,9 @@ def compile_rule(compiler, flags, src_file, target):
     else:
         target_set.add(target)
         target_path = os.path.dirname(target)
-        return "%s: %s | %s \n\t%s %s -c $^ -o $@\n" % (
-            target, src_file, target_path, compiler,
-            flags) + dir_rule(target_path)
+        return "%s: %s | %s \n\t%s %s -c %s -o %s\n" % (
+            target, src_file, target_path, compiler, flags, src_file,
+            target) + dir_rule(target_path)
 
 
 def link_rule(linker, flags, objs, target):
@@ -53,8 +53,10 @@ def link_rule(linker, flags, objs, target):
     else:
         target_set.add(target)
         target_path = os.path.dirname(target)
-        return "%s: %s | %s\n\t%s $^ %s -o $@\n" % (target, list2makestr(
-            objs), target_path, linker, flags) + dir_rule(target_path)
+        objs_str = list2makestr(objs)
+        return "%s: %s | %s\n\t%s %s %s -o %s\n" % (
+            target, objs_str, target_path, linker, objs_str, flags,
+            target) + dir_rule(target_path)
 
 
 def ar_rule(ar, flags, objs, target):
@@ -63,9 +65,10 @@ def ar_rule(ar, flags, objs, target):
     else:
         target_set.add(target)
         target_path = os.path.dirname(target)
-        return "%s: %s | %s\n\t%s %s $@ $^\n" % (target, list2makestr(objs),
-                                                 target_path, ar,
-                                                 flags) + dir_rule(target_path)
+        objs_str = list2makestr(objs)
+        return "%s: %s | %s\n\t%s %s %s %s\n" % (
+            target, objs_str, target_path, ar, flags, target,
+            objs_str) + dir_rule(target_path)
 
 
 def change_ext(filename, new_ext):
@@ -88,35 +91,35 @@ makefile_head = [
     """
 config?=debug
 build_dir:=build/${config}
-flags = -Isrc -std=c++1z -Wall -Wfloat-conversion -Wsign-conversion -Werror -MMD
-gtest_dir = googletest/googletest
-gtest_flags =-isystem ${gtest_dir}/include -I${gtest_dir}
-link_flags =-lstdc++ -lm -pthread -lblas
+flags:= -Isrc -std=c++1z -Wall -Wfloat-conversion -Wsign-conversion -Werror -MMD
+gtest_dir:= googletest/googletest
+gtest_flags:=-isystem ${gtest_dir}/include -I${gtest_dir}
+link_flags:=-lstdc++ -lm -pthread -lblas
 ifeq ($(config), release)
-	flags += -O3 -DNDEBUG
-	link_flags += -O3 -DNDEBUG
+  flags += -O3 -DNDEBUG
+  link_flags += -O3 -DNDEBUG
 else
   ifeq ($(config), profile)
-	  flags += -g -O3 -pg -no-pie
-	  link_flags += -g -O3 -no-pie
+    flags += -g -O3 -pg -no-pie
+    link_flags += -g -O3 -no-pie
   else
     ifeq ($(config), coverage)
       flags += -g -ftest-coverage -fprofile-arcs
-	  link_flags += -g -fprofile-arcs
+      link_flags += -g -fprofile-arcs
     else
-	  ifeq ($(config), debug)
-	    flags += -g
-	    link_flags += -g
-	  else
+      ifeq ($(config), debug)
+        flags += -g
+        link_flags += -g
+      else
 $(error Unknown config: $(config))
-	  endif
+      endif
     endif
   endif
 endif
 """
 ]
 makefile_major_targets = [
-"""
+    """
 .PHONY: utest lib
 utest: ${build_dir}/utest
 lib: ${build_dir}/libscigg.a
@@ -155,7 +158,14 @@ makefile_body.append(
               obj_files + test_obj_files + gtest_obj_files,
               '${build_dir}/utest'))
 
-makefile_body.append(ar_rule('ar', 'crf', obj_files, "${build_dir}/libscigg.a"))
+makefile_body.append(
+    ar_rule('ar', 'crf', obj_files, "${build_dir}/libscigg.a"))
+
+deps = list2makestr(
+    map(lambda obj: change_ext(obj, '.d'),
+        obj_files + test_obj_files + gtest_obj_files))
+
+makefile_body.append('deps:=' + deps + '\n')
 
 f = open('makefile', 'w')
 f.write(''.join(
