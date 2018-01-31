@@ -8,6 +8,7 @@ class diff1_expr
 public:
     virtual real_t eval(vector_const_view x,
                         vector_mutable_view grad) const = 0;
+    virtual ~diff1_expr() {}
 };
 
 class diff1_var : public diff1_expr
@@ -40,6 +41,7 @@ public:
     }
     void add_child(const diff1_expr* child) { _children.push_back(child); }
     real_t eval(vector_const_view x, vector_mutable_view grad) const override;
+    ~diff1_sum() override = default;
 };
 
 // grad(f)*g*h + f*grad(g)*h + f*g*grad(h)
@@ -55,6 +57,7 @@ public:
     }
     void add_child(const diff1_expr* child) { _children.push_back(child); }
     real_t eval(vector_const_view x, vector_mutable_view grad) const override;
+    ~diff1_prod() override = default;
 };
 
 class diff1_expr_store
@@ -65,7 +68,7 @@ public:
     template <typename T, typename... Args>
     T* custom(Args&&... args)
     {
-        _expr_list.emplace_back(new T(std::forward<Args>(args)...));
+        _expr_list.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         return static_cast<T*>(_expr_list.back().get());
     }
     diff1_var* var(size_t var_idx) { return custom<diff1_var>(var_idx); }
