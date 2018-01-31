@@ -17,7 +17,7 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
                        vector_const_view x0, real_t y0,
                        vector_const_view grad0,  //
                        vector_mutable_view x1, real_t& y1,
-                       vector_mutable_view grad1, real_t tol)
+                       vector_mutable_view grdiff1, real_t tol)
 {
     real_t step_upper_bound = 0.0;
     real_t deval = dot(grad0, p);
@@ -28,8 +28,8 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
         // x1 = alpha * p + x0
         copy(x0, x1);
         blas_axpy(alpha, p, x1);
-        obj(y1, grad1, x1);
-        if (norm2(grad1) < tol)
+        obj(y1, grdiff1, x1);
+        if (norm2(grdiff1) < tol)
         {
             // exit condition satisfied
             break;
@@ -39,7 +39,7 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
             step_upper_bound = alpha;
             alpha /= 2.0;
         }
-        else if (dot(grad1, p) <
+        else if (dot(grdiff1, p) <
                  curvature)  // curvature not large enough, increase step
         {
             if (step_upper_bound == 0.0)  // haven't found the upper bound
@@ -80,7 +80,7 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
 
     size_t N = x.dim();
     vector grad0(N);
-    vector grad1(N);
+    vector grdiff1(N);
     auto x0 = vector(x);
     vector x1(x.dim());
     real_t y0;
@@ -94,33 +94,34 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
     obj(y0, grad0, x0);
     alpha = first_step_len;
     blas_axpy(-1.0 / norm2(grad0), grad0, p);
-    line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grad1, tol);
+    line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grdiff1,
+                      tol);
     matrix H = identity_matrix(N);
     sub(x1, x0, dx);
-    sub(grad1, grad0, dg);
+    sub(grdiff1, grad0, dg);
     scale(dot(dg, dx) / dot(dg, dg), H);
     // start iteration
     for (size_t i = 0; i < max_iter; i++)
     {
         update_hmatrix(H, dx, dg);
         // p = - H * grad
-        blas_matrix_vector(-1.0, H, grad1, 0.0, p);
-        assert(grad1 * p < 0);
+        blas_matrix_vector(-1.0, H, grdiff1, 0.0, p);
+        assert(grdiff1 * p < 0);
         std::swap(x0, x1);
-        std::swap(grad0, grad1);
+        std::swap(grad0, grdiff1);
         std::swap(y0, y1);
         alpha = 1.0;
-        line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grad1,
+        line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grdiff1,
                           tol);
-        if (norm2(grad1) <= tol)
+        if (norm2(grdiff1) <= tol)
         {
             break;
         }
         sub(x1, x0, dx);
-        sub(grad1, grad0, dg);
+        sub(grdiff1, grad0, dg);
     }
     copy(x1, x);
     y = y1;
-    return norm2(grad1);
+    return norm2(grdiff1);
 }
 }

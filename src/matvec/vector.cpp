@@ -39,6 +39,7 @@ bool operator==(vector_const_view x, vector_const_view y)
 }
 vector create_vector(size_t n, const std::vector<double> &v)
 {
+    assert(n == v.size());
     vector vo(n);
     for (size_t i = 0; i < n; i++)
     {
