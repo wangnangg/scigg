@@ -8,13 +8,13 @@ class digraph
 public:
     struct arc
     {
-        const size_t dst;
+        size_t dst;
         Ta data;
         arc(size_t dst, Ta data) : dst(dst), data(std::move(data)) {}
     };
     struct node
     {
-        const size_t idx;
+        size_t idx;
         Tn data;
         std::vector<arc> out_arc;
         node(size_t idx, Tn data) : idx(idx), data(std::move(data)) {}
