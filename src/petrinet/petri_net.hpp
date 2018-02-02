@@ -247,8 +247,13 @@ private:
     bool valid_pid(pid_t pid) const { return pid < _place_count; }
 };
 
-using default_token = int_t;
+using default_token = uint_t;
 using default_marking = std::vector<default_token>;
 template <typename Tdata>
 using default_petri_net = petri_net_tmpl<Tdata, default_marking, default_token>;
+
+struct default_marking_comp
+{
+    bool operator()(const default_marking& m1, const default_marking& m2) const;
+};
 }

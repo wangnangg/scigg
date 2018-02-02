@@ -2,6 +2,7 @@
 #include "graph.hpp"
 #include "petri_net.hpp"
 #include "type.hpp"
+
 namespace scigg
 {
 template <typename PetriNet,
@@ -9,6 +10,10 @@ template <typename PetriNet,
           typename MkFunc>
 using reach_graph_tmpl = DiGraph<typename PetriNet::marking,
                                  const typename PetriNet::transition*, MkFunc>;
+
+template <typename PetriNet>
+using default_reach_graph =
+    reach_graph_tmpl<PetriNet, ordered_digraph, default_marking_comp>;
 
 template <typename PetriNet,
           template <typename Tn, typename Ta, typename TnFunc> typename DiGraph,
