@@ -7,14 +7,15 @@
 
 namespace scigg
 {
-template <typename Tdata, typename Marking, typename Token>
+template <typename Tdata, typename Marking>
 class petri_net_tmpl
 {
 public:
     using pid_t = size_t;
     using tid_t = size_t;
     using marking = Marking;
-    using token = Token;
+    using token = typename Marking::token;
+    using tdata = Tdata;
     class context
     {
     private:
@@ -23,8 +24,7 @@ public:
 
     public:
         context(const petri_net_tmpl& pn, const marking& mk) : pn(pn), mk(mk) {}
-        bool is_absorbing();
-        token ntoken(pid_t pid);
+        token ntoken(pid_t pid) { return mk[pid]; }
     };
 
     template <typename R>
@@ -33,9 +33,13 @@ public:
     public:
         using query_func = std::function<R(context ctxt)>;
         marking_dep_var() : _func(nullptr) {}
-        marking_dep_var(query_func func) : _func(func) {}
+        template <typename QueryFunc,
+                  std::enable_if_t<!std::is_convertible<QueryFunc, R>::value,
+                                   int> = 0>
+        marking_dep_var(QueryFunc func) : _func(func)
+        {
+        }
         marking_dep_var(R value) : _val(value), _func(nullptr) {}
-        marking_dep_var(R (*func_ptr)(context ctxt)) : _func(func_ptr) {}
         R operator()(context ctxt) const
         {
             if (_func)
@@ -55,6 +59,7 @@ public:
     };
     using mk_uint = marking_dep_var<uint_t>;
     using mk_bool = marking_dep_var<bool>;
+    using mk_tdata = marking_dep_var<tdata>;
 
     class arc
     {
@@ -73,42 +78,42 @@ public:
         tid_t _idx;
         uint_t _prio;
         mk_bool _enable;
-        Tdata _data;
+        mk_tdata _data;
         std::vector<arc> _in_arc;
         std::vector<arc> _out_arc;
         std::vector<arc> _inh_arc;
 
     public:
         transition(const petri_net_tmpl* pn, tid_t idx, uint_t prio,
-                   mk_bool enable, Tdata data)
+                   mk_bool enable, mk_tdata data)
             : _pn(pn), _idx(idx), _prio(prio), _enable(enable), _data(data)
         {
         }
-        transition& add_in_arc(pid_t pid, mk_uint multi)
+        transition& add_in_arc(pid_t pid, mk_uint multi = 1)
         {
             assert(_pn->valid_pid(pid));
             _in_arc.emplace_back(pid, multi);
             return *this;
         }
-        transition& add_out_arc(pid_t pid, mk_uint multi)
+        transition& add_out_arc(pid_t pid, mk_uint multi = 1)
         {
             assert(_pn->valid_pid(pid));
             _out_arc.emplace_back(pid, multi);
             return *this;
         }
-        transition& add_inh_arc(pid_t pid, mk_uint multi)
+        transition& add_inh_arc(pid_t pid, mk_uint multi = 1)
         {
             assert(_pn->valid_pid(pid));
             _inh_arc.emplace_back(pid, multi);
             return *this;
         }
         tid_t idx() const { return _idx; }
-        const Tdata& data() const { return _data; }
         uint_t prio() const { return _prio; }
         const std::vector<arc>& in_arc() const { return _in_arc; };
         const std::vector<arc>& out_arc() const { return _out_arc; }
         const std::vector<arc>& inh_arc() const { return _inh_arc; };
         bool enabled(context ct) const { return _enable(ct); }
+        tdata data(context ct) const { return _data(ct); }
     };
 
 private:
@@ -181,6 +186,11 @@ public:  // observer
         return result_mk;
     }
 
+    tdata trans_data(tid_t t_ind, const marking& mk) const
+    {
+        return find_trans(t_ind).data({*this, mk});
+    }
+
     marking empty_marking() const { return marking(_place_count, 0); }
 
 public:  // modifier
@@ -188,10 +198,10 @@ public:  // modifier
         : _place_count(place_count), _g_enable(true)
     {
     }
-    transition& add_trans(uint_t prio, mk_bool enable, Tdata data)
+    transition& add_trans(uint_t prio, mk_bool enable, mk_tdata data)
     {
         tid_t new_idx = _trans_list.size();
-        auto tr = transition(this, new_idx, prio, enable, std::move(data));
+        auto tr = transition(this, new_idx, prio, enable, data);
         auto hprio_tr = std::upper_bound(_trans_list.begin(), _trans_list.end(),
                                          tr, trans_comp);
         _trans_list.insert(hprio_tr, std::move(tr));
@@ -202,9 +212,18 @@ public:  // modifier
         }
         return find_trans(new_idx);
     }
-    transition& add_in_arc(tid_t tid, pid_t pid, mk_uint multi);
-    transition& add_out_arc(tid_t tid, pid_t pid, mk_uint multi);
-    transition& add_inh_arc(tid_t tid, pid_t pid, mk_uint multi);
+    transition& add_in_arc(tid_t tid, pid_t pid, mk_uint multi = 1)
+    {
+        return this->operator[](tid).add_in_arc(pid, multi);
+    }
+    transition& add_out_arc(tid_t tid, pid_t pid, mk_uint multi = 1)
+    {
+        return this->operator[](tid).add_out_arc(pid, multi);
+    }
+    transition& add_inh_arc(tid_t tid, pid_t pid, mk_uint multi = 1)
+    {
+        return this->operator[](tid).add_inh_arc(pid, multi);
+    }
     void set_g_enable(mk_bool enable) { _g_enable = enable; }
 
 private:
@@ -247,13 +266,45 @@ private:
     bool valid_pid(pid_t pid) const { return pid < _place_count; }
 };
 
-using default_token = uint_t;
-using default_marking = std::vector<default_token>;
-template <typename Tdata>
-using default_petri_net = petri_net_tmpl<Tdata, default_marking, default_token>;
-
-struct default_marking_comp
+template <typename Token>
+class marking_tmpl
 {
-    bool operator()(const default_marking& m1, const default_marking& m2) const;
+public:
+    using token = Token;
+
+private:
+    std::vector<token> _token_list;
+
+public:
+    marking_tmpl(size_t ntoken, token val) : _token_list(ntoken, val) {}
+    token operator[](size_t i) const { return _token_list[i]; }
+    token& operator[](size_t i) { return _token_list[i]; }
+    size_t size() const { return _token_list.size(); }
 };
+
+template <typename Marking>
+struct marking_comp_tmpl
+{
+    bool operator()(const Marking& m1, const Marking& m2) const
+    {
+        for (size_t i = 0; i < m1.size(); i++)
+        {
+            if (m1[i] < m2[i])
+            {
+                return true;
+            }
+            else if (m1[i] > m2[i])
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+};
+
+using default_marking = marking_tmpl<uint_t>;
+using default_marking_comp = marking_comp_tmpl<default_marking>;
+
+template <typename Tdata>
+using default_petri_net = petri_net_tmpl<Tdata, default_marking>;
 }

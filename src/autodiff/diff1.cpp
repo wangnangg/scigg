@@ -31,16 +31,32 @@ real_t diff1_prod::eval(vector_const_view x, vector_mutable_view grad) const
     real_t val = 1.0;
     matrix child_grad(grad.dim(), _children.size());
     vector child_val(_children.size());
+    vector amp(child_val.dim());
     for (size_t i = 0; i < _children.size(); i++)
     {
         child_val[i] = _children[i]->eval(x, child_grad.col(i));
         val *= child_val[i];
     }
-    for (size_t i = 0; i < child_val.dim(); i++)
+    if (val > 0)  // fast path
     {
-        child_val[i] = val / child_val[i];
+        for (size_t i = 0; i < child_val.dim(); i++)
+        {
+            amp[i] = val / child_val[i];
+        }
     }
-    dot(child_grad, child_val, grad);
+    else
+    {
+        for (size_t i = 0; i < child_val.dim(); i++)
+        {
+            amp[i] = 1.0;
+            for (size_t j = 0; j < child_val.dim(); j++)
+            {
+                if (i == j) continue;
+                amp[i] *= child_val[j];
+            }
+        }
+    }
+    dot(child_grad, amp, grad);
     return val;
 }
 

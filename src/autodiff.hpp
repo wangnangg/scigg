@@ -65,6 +65,9 @@ class diff1_expr_store
     std::vector<std::unique_ptr<diff1_expr>> _expr_list;
 
 public:
+    diff1_expr_store() = default;
+    diff1_expr_store(const diff1_expr_store&) = delete;
+    diff1_expr_store& operator=(const diff1_expr_store&) = delete;
     template <typename T, typename... Args>
     T* custom(Args&&... args)
     {

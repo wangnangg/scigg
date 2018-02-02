@@ -31,3 +31,18 @@ TEST(test_autodiff, diff1_prod)
     ASSERT_EQ(result, 60.0);
     ASSERT_EQ(grad, create_vector(3, {35, 20, 15}));
 }
+
+TEST(test_autodiff, diff1_prod_1)
+{
+    // s = x * y, x  = 0
+    auto st = diff1_expr_store();
+    auto x = st.var(0);
+    auto y = st.var(1);
+    auto s = st.prod(x, y);
+
+    const auto val = create_vector(2, {0, 1});
+    auto grad = vector(2);
+    auto result = s->eval(val, grad);
+    ASSERT_EQ(result, 0);
+    ASSERT_EQ(grad, create_vector(2, {1.0, 0.0}));
+}
