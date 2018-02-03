@@ -126,3 +126,32 @@ TEST(test_petri_net, diff1_spn)
     ASSERT_EQ(spn.trans_data(t2, init_mk)->eval(parm, grad), 0.0);
     ASSERT_EQ(grad, create_vector(1, {0.0}));
 }
+
+TEST(test_petri_net, diff1_spn_reach_gen)
+{
+    default_diff1_spn spn(2);
+    diff1_expr_store st;
+    spn.add_trans(
+           0, true,
+           [&](auto ct) { return st.prod(st.con(ct.ntoken(0)), st.var(0)); })
+        .add_in_arc(0)
+        .add_out_arc(1)
+        .idx();
+    spn.add_trans(
+           0, true,
+           [&](auto ct) { return st.prod(st.con(ct.ntoken(1)), st.var(0)); })
+        .add_in_arc(1, 1)
+        .add_out_arc(0, 1)
+        .idx();
+    auto init_mk = spn.empty_marking();
+    init_mk[0] = 2;
+    auto parm = create_vector(1, {3});
+    auto grad = vector(1, 0.0);
+    default_reach_graph<default_diff1_spn> rg;
+    gen_reach_graph(spn, init_mk, rg);
+    ASSERT_EQ(rg.node_count(), 3);
+    ASSERT_EQ(rg[0].out_arc()[0].data()->eval(parm, grad), 6.0);
+    ASSERT_EQ(rg[1].out_arc()[0].data()->eval(parm, grad), 3.0);
+    ASSERT_EQ(rg[1].out_arc()[1].data()->eval(parm, grad), 3.0);
+    ASSERT_EQ(rg[2].out_arc()[0].data()->eval(parm, grad), 6.0);
+}
