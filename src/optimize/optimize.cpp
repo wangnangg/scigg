@@ -12,7 +12,7 @@ namespace scigg
 //  x is the next point
 //  y = f(x)
 //  grad = df(x)
-void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
+void line_search_wolfe(const diff1_obj_func& obj, real_t c1, real_t c2,
                        vector_const_view p, real_t& alpha,  //
                        vector_const_view x0, real_t y0,
                        vector_const_view grad0,  //
@@ -28,7 +28,7 @@ void line_search_wolfe(const diff1_func& obj, real_t c1, real_t c2,
         // x1 = alpha * p + x0
         copy(x0, x1);
         blas_axpy(alpha, p, x1);
-        obj(y1, grdiff1, x1);
+        y1 = obj(x1, grdiff1);
         if (norm2(grdiff1) < tol)
         {
             // exit condition satisfied
@@ -70,7 +70,7 @@ void update_hmatrix(matrix_mutable_view H, vector_const_view s,
     blas_rank1(p * p * dot(v, y) + p, s, s, H);
 }
 
-real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
+real_t quasi_newton_bfgs(const diff1_obj_func& obj, vector_mutable_view x,
                          real_t& y, real_t first_step_len, real_t c1, real_t c2,
                          real_t tol, uint_t max_iter)
 {
@@ -91,7 +91,7 @@ real_t quasi_newton_bfgs(const diff1_func& obj, vector_mutable_view x,
     real_t alpha;
 
     // bootstrap matrix H
-    obj(y0, grad0, x0);
+    y0 = obj(x0, grad0);
     alpha = first_step_len;
     blas_axpy(-1.0 / norm2(grad0), grad0, p);
     line_search_wolfe(obj, c1, c2, p, alpha, x0, y0, grad0, x1, y1, grdiff1,
