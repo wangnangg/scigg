@@ -59,6 +59,7 @@ public:
     };
     using mk_uint = marking_dep_var<uint_t>;
     using mk_bool = marking_dep_var<bool>;
+    using mk_real = marking_dep_var<real_t>;
     using mk_tdata = marking_dep_var<tdata>;
 
     class arc
